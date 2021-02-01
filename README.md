@@ -1,4 +1,4 @@
-#FairAPI
+# FairAPI
 
 The UCU master thesis.
 The aim of the project is to develop API for fact checking for Wikipedia. 
