@@ -1,0 +1,15 @@
+# pycharm settings
+.idea/
+
+# distribution
+/dist
+/build
+/*.egg-info
+
+# python
+__pycache__/
+logs/*
+jars/*
+locks/*
+
+/modules/models
