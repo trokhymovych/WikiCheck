@@ -1,5 +1,7 @@
 # pycharm settings
 .idea/
+.DS_Store
+modules/.DS_Store
 
 # distribution
 /dist
