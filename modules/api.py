@@ -4,13 +4,14 @@ from argparse import ArgumentParser
 import sys
 
 from flask import Flask, request
-from flask_restx import Api, Resource, fields
+from flask_restx import Api, Resource, fields, marshal
 from flask_cors import CORS
 from pathlib import Path
 
 # for debug mode
 sys.path.insert(0, "/Users/ntr/Documents/tresh/fairapi")
 from modules.sentence_bert_model import SentenceBertModel
+from modules.complex_model import WikiFactChecker
 from modules.logging_utils import get_logger, check_if_none, ROOT_LOGGER_NAME
 
 parser = ArgumentParser()
@@ -31,12 +32,14 @@ logger.info(f"Using config {config}")
 
 logger.info(f"Loading model {config.get('model_name')}...")
 model = SentenceBertModel(logger, **config)
+complex_model = WikiFactChecker(logger, **config)
 
 # setting the api
 app = Flask(__name__)
 CORS(app)
 api = Api(app, version=config.get("api_version", "0.0"), title='Wikipedia fact checking API')
 ns1 = api.namespace('nli_model', description=config.get('model_name', 'Wikipedia NLI model'))
+ns2 = api.namespace('fact_checking_model', description='Wikipedia Fact checking model')
 
 # response format
 response = api.model('model_response', {
@@ -44,6 +47,20 @@ response = api.model('model_response', {
     'contradiction_prob': fields.Float(required=True, description='contradiction class probability'),
     'entailment_prob': fields.Float(required=True, description='entailment class probability'),
     'neutral_prob': fields.Float(required=True, description='neutral class probability'),
+})
+
+
+response_full = api.model('Record', {
+          "text": fields.String(required=True, description=''),
+          "article": fields.String(required=True, description=''),
+          "label": fields.String(required=False, description=''),
+          "contradiction_prob": fields.Float(required=True, description=''),
+          "entailment_prob": fields.Float(required=True, description=''),
+          "neutral_prob": fields.Float(required=True, description=''),
+})
+
+response_model = api.model("Result", {
+    'results': fields.List(fields.Nested(response_full))
 })
 
 
@@ -71,6 +88,31 @@ class TodoList(Resource):
         logger.info(f'API; ModelOne Get response; difference: {dif_time}')
 
         return result
+
+
+@ns2.route('/')
+class TodoList(Resource):
+
+    @ns2.doc('trigger_model')
+    @ns2.param('claim', _in='query')
+    @ns2.marshal_with(response_model)
+    def get(self):
+        start_time = datetime.datetime.now()
+        claim = request.args.get('claim')
+
+        claim = check_if_none(claim)
+
+        logger.info(f'Query with params={{text: {claim}}}')
+        result = complex_model.predict_all(claim)
+
+        end_time = datetime.datetime.now()
+        dif_time = str(end_time - start_time)
+
+        logger.info(f'API; ModelFull Get response; difference: {dif_time}')
+
+        logger.info(f'API; ModelFull sending the response')
+        # The kwarg envelope does the trick
+        return {'results': result}
 
 
 if __name__ == '__main__':

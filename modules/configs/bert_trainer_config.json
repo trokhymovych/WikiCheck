@@ -1,8 +1,8 @@
 {
-  "model_name": "SentenceBertBase",
-  "logs_path": "logs/logs_bert.log",
-  "bert_model_path": "modules/models/bert_model_trained_2/",
-  "classification_model_path": "modules/models/classifier_model_2",
-  "cache_path": "modules/models/texts_cache.pickle",
-  "api_version": "0.1"
+  "train_path": "/opt/math/jupyter/ntr/Experiments_with_text/data/SNLI/train.tsv",
+  "dev_path": "/opt/math/jupyter/ntr/Experiments_with_text/data/SNLI/dev.tsv",
+  "test_path": "/opt/math/jupyter/ntr/Experiments_with_text/data/SNLI/test.tsv",
+  "base_model": "bert-base-uncased",
+  "batch_size": 64,
+  "path_to_save": "/opt/math/jupyter/ntr/Experiments_with_text/fairapi/models/"
 }

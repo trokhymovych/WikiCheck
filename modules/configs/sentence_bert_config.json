@@ -3,6 +3,6 @@
   "logs_path": "logs/logs_bert.log",
   "bert_model_path": "modules/models/bert_model_trained_2/",
   "classification_model_path": "modules/models/classifier_model_2",
-  "cache_path": "modules/models/texts_cache.pickle",
+  "cache_path": "",
   "api_version": "0.1"
 }
