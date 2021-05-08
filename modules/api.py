@@ -9,7 +9,7 @@ from flask_cors import CORS
 from pathlib import Path
 
 # for debug mode
-sys.path.insert(0, "/Users/ntr/Documents/tresh/fairapi")
+sys.path.insert(0, "/home/trokhymovych/fairapi")
 from modules.sentence_bert_model import SentenceBertModel
 from modules.complex_model import WikiFactChecker
 from modules.logging_utils import get_logger, check_if_none, ROOT_LOGGER_NAME
