@@ -1,0 +1,12 @@
+wikipedia==1.4.0
+Flask==1.1.2
+tqdm==4.60.0
+pandas==1.2.3
+torch==1.7.1
+nltk==3.5
+flair==0.8.0.post1
+flask_restx==0.2.0
+sentence_transformers==0.3.9
+Flask_Cors==3.0.10
+numpy==1.19.5
+mediawiki==0.0.1

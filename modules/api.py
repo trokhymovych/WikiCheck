@@ -49,14 +49,13 @@ response = api.model('model_response', {
     'neutral_prob': fields.Float(required=True, description='neutral class probability'),
 })
 
-
 response_full = api.model('Record', {
-          "text": fields.String(required=True, description=''),
-          "article": fields.String(required=True, description=''),
-          "label": fields.String(required=False, description=''),
-          "contradiction_prob": fields.Float(required=True, description=''),
-          "entailment_prob": fields.Float(required=True, description=''),
-          "neutral_prob": fields.Float(required=True, description=''),
+    "text": fields.String(required=True, description=''),
+    "article": fields.String(required=True, description=''),
+    "label": fields.String(required=False, description=''),
+    "contradiction_prob": fields.Float(required=True, description=''),
+    "entailment_prob": fields.Float(required=True, description=''),
+    "neutral_prob": fields.Float(required=True, description=''),
 })
 
 response_model = api.model("Result", {
@@ -113,6 +112,10 @@ class TodoList(Resource):
         logger.info(f'API; ModelFull sending the response')
         # The kwarg envelope does the trick
         return {'results': result}
+
+    def put(self):
+        print(complex_model.profiler.times_global)
+        complex_model.dump_time_stats()
 
 
 if __name__ == '__main__':

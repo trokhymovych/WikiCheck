@@ -1,8 +1,8 @@
 {
   "model_name": "SentenceBertBase",
   "logs_path": "logs/logs_bert.log",
-  "bert_model_path": "modules/models/bert_model_trained_2/",
-  "classification_model_path": "modules/models/classifier_model_2",
+  "bert_model_path": "modules/models/bert_sentence_fever/bert_model_trained/",
+  "classification_model_path": "modules/models/bert_sentence_fever/classifier_model",
   "cache_path": "",
   "api_version": "0.1"
 }
