@@ -4,11 +4,13 @@ from argparse import ArgumentParser
 import sys
 
 from flask import Flask, request
+from werkzeug.middleware.proxy_fix import ProxyFix
 from flask_restx import Api, Resource, fields, marshal
 from flask_cors import CORS
 from pathlib import Path
 
 # for debug mode
+# sys.path.insert(0, "/Users/ntr/Documents/tresh/fairapi")
 sys.path.insert(0, "/home/trokhymovych/fairapi")
 from modules.sentence_bert_model import SentenceBertModel
 from modules.complex_model import WikiFactChecker
@@ -36,6 +38,7 @@ complex_model = WikiFactChecker(logger, **config)
 
 # setting the api
 app = Flask(__name__)
+app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_port=1)
 CORS(app)
 api = Api(app, version=config.get("api_version", "0.0"), title='Wikipedia fact checking API')
 ns1 = api.namespace('nli_model', description=config.get('model_name', 'Wikipedia NLI model'))
@@ -119,4 +122,4 @@ class TodoList(Resource):
 
 
 if __name__ == '__main__':
-    app.run(debug=True, port=8001, host="0.0.0.0", threaded=True)
+    app.run(debug=True, port=80, host="0.0.0.0", threaded=True)
