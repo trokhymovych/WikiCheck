@@ -1,21 +1,21 @@
 # WikiCheck API
 
-Repository with implementation of WikiCheck API. 
+Repository with the implementation of WikiCheck API. 
 The project is done in cooperation with Wikimedia Foundation and Ukrainian Catholic University. 
 
 The link to API: https://nli.wmcloud.org
 
 #### The structure of the project: 
-The project consists of **modules** directory with implementation of modules 
-used for inference along with script for NLI models training. 
+The project consists of **modules** directory with the implementation of modules 
+used for inference along with the script for NLI models training. 
 
 The **configs** directory includes configuration files for training and inference. 
 
 The **notebooks** directory (not added yet) includes .ipynb notebooks with experiments done during the research.
 
-We use DVC with Google drive remote for efficient models version control. 
-In case you want to get access to our fine tuned models, you can load them from from [here](https://drive.google.com/drive/folders/1ABnPliL2ouDX7vK9RpaUZLLawxPRRgyb?usp=sharing). 
-Also you can train your own model by running ```modules/model_trainer.py``` script. 
+We use DVC with Google drive remote for efficient model version control. 
+If you want to get access to our fine-tuned models, you can load them from [here](https://drive.google.com/drive/folders/1ABnPliL2ouDX7vK9RpaUZLLawxPRRgyb?usp=sharing). 
+Also, you can train your model by running the ```modules/model_trainer.py``` script. 
 
 
 #### API setup and run
@@ -48,3 +48,10 @@ Also you can train your own model by running ```modules/model_trainer.py``` scri
 ```python start.py --config configs/inference/sentence_bert_config.json```
 
 
+ToDo:
+- [x] Refactor code for inference
+- [x] Write README.md
+- [ ] Refactor training script
+- [ ] Add training configs
+- [ ] Add notebooks with experiments
+- [ ] Add aggregation endpoint to API
