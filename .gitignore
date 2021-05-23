@@ -15,5 +15,6 @@ jars/*
 locks/*
 
 /models
-/notebooks
+/notebooks/in_progress
+notebooks/.ipynb_checkpoints/
 /data

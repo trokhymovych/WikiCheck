@@ -1,0 +1,11 @@
+{
+  "train_path": "/opt/math/jupyter/ntr/Experiments_with_text/data/SNLI/train_snli_style_sampling_clean_filltered.csv",
+  "dev_path": "/opt/math/jupyter/ntr/Experiments_with_text/data/SNLI/test_snli_style.csv",
+  "test_path": "/opt/math/jupyter/ntr/Experiments_with_text/data/SNLI/test_snli_style.csv",
+  "base_model": "/opt/math/jupyter/ntr/Experiments_with_text/bart_mlm",
+  "batch_size":12,
+  "path_to_save": "/opt/math/jupyter/ntr/Experiments_with_text/models_filtered/bart_fine/"
+}
+
+
+
