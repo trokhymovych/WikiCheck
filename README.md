@@ -38,8 +38,9 @@ Also you can train your own model by running ```modules/model_trainer.py``` scri
 
 - Load pretrained models. There are two options: 
     - Loading models with DVC (preferred):
-    ```dvc remote add -d myremote gdrive://17WOb9P8HqPIc7eJeWrHxTziY3HSDd_cd```
+
     ```dvc pull``` 
+    
     - Loading models from [here](https://drive.google.com/drive/folders/1ABnPliL2ouDX7vK9RpaUZLLawxPRRgyb?usp=sharing)
 
 - Run the API:
