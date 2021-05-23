@@ -1,12 +1,49 @@
-# FairAPI
+# WikiCheck API
 
-The UCU master thesis.
-The aim of the project is to develop API for fact checking for Wikipedia. 
-Currently works with pretrained sentence based model. 
-Given the text and hypothesis as an input return the label (entailment, contradiction, or neutral)
+Repository with implementation of WikiCheck API. 
+The project is done in cooperation with Wikimedia Foundation and Ukrainian Catholic University. 
 
-In order to run API, run this in command line:
+The link to API: https://nli.wmcloud.org
 
-```bash
-python modules/api.py  
-```
+#### The structure of the project: 
+The project consists of **modules** directory with implementation of modules 
+used for inference along with script for NLI models training. 
+
+The **configs** directory includes configuration files for training and inference. 
+
+The **notebooks** directory (not added yet) includes .ipynb notebooks with experiments done during the research.
+
+We use DVC with Google drive remote for efficient models version control. 
+In case you want to get access to our fine tuned models, you can load them from from [here](https://drive.google.com/drive/folders/1ABnPliL2ouDX7vK9RpaUZLLawxPRRgyb?usp=sharing). 
+Also you can train your own model by running ```modules/model_trainer.py``` script. 
+
+
+#### API setup and run
+
+- Clone the official WikiCheck repo and cd into it 
+
+```git clone https://github.com/trokhymovych/WikiCheck.git```
+
+```cd WikiCheck```
+
+- Create and activate virtualenv: 
+
+```virtualenv -p python venv```
+
+```source venv/bin/activate```
+
+- Install requirements from  requirements.txt:
+
+```pip install -r requirements.txt```
+
+- Load pretrained models. There are two options: 
+    - Loading models with DVC (preferred):
+    ```dvc remote add -d myremote gdrive://17WOb9P8HqPIc7eJeWrHxTziY3HSDd_cd```
+    ```dvc pull``` 
+    - Loading models from [here](https://drive.google.com/drive/folders/1ABnPliL2ouDX7vK9RpaUZLLawxPRRgyb?usp=sharing)
+
+- Run the API:
+
+```python start.py --config configs/inference/sentence_bert_config.json```
+
+
