@@ -2,6 +2,10 @@ from typing import *
 import logging
 from pathlib import Path
 
+from modules.utils.measurer import TimeMeasurer
+
+DEFAULT_MEASURER = TimeMeasurer()
+
 DEFAULT_FORMAT_PARAMS = dict(
     fmt='[{asctime}][{name}][{levelname}] {message}',
     datefmt='%Y-%m-%d %H:%M:%S',
@@ -9,6 +13,8 @@ DEFAULT_FORMAT_PARAMS = dict(
 )
 
 ROOT_LOGGER_NAME = 'NLI_API'
+
+DEFAULT_LOGGER = logging.getLogger("DEFAULT")
 
 
 def get_logger(name: str,

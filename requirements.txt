@@ -9,5 +9,4 @@ flask_restx==0.2.0
 sentence_transformers==0.4.1
 Flask_Cors==3.0.10
 numpy==1.19.5
-mediawiki==0.0.1
-wiki
+pymediawiki
