@@ -45,6 +45,7 @@ class WikiFactChecker:
         probabilities = self.model_level_two.predict_batch(claim, all_sentences)
 
         results = []
+        sorting_logic = []
         for p, text, article in zip(probabilities, all_sentences, all_articles):
             final_label = self.model_level_two.int2label.get(np.argmax(p))
             results.append({"claim": claim,
@@ -55,8 +56,11 @@ class WikiFactChecker:
                             'entailment_prob': p[1],
                             'neutral_prob': p[2]})
 
+            sorting_logic.append(np.max([p[1], p[0]]))
+        ids = np.argsort(sorting_logic)
+        sorted_results = [results[i] for i in ids[::-1]]
         self.profiler.end_sample()
-        return results
+        return sorted_results
 
     def dump_time_stats(self):
         self.profiler.finish_logging_time()
