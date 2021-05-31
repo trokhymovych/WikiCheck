@@ -45,6 +45,7 @@ CORS(app)
 api = Api(app, version=config.get("api_version", "0.0"), title='WikiCheck API')
 ns1 = api.namespace('nli_model', description=config.get('model_name', 'Wikipedia NLI model'))
 ns2 = api.namespace('fact_checking_model', description='Fact checking model')
+ns3 = api.namespace('fact_checking_aggregated', description='Fact checking model with aggregation')
 
 response = api.model('model_response', {
     'label': fields.String(required=True, description='classification label'),
@@ -65,6 +66,11 @@ response_full = api.model('Record', {
 
 response_model = api.model("Result", {
     'results': fields.List(fields.Nested(response_full))
+})
+
+response_aggregated = api.model("Aggregated_result", {
+    "predicted_label": fields.String(required=True, description='Claim'),
+    'predicted_evidence': fields.List(fields.List(fields.String()))
 })
 
 
@@ -117,6 +123,29 @@ class TodoList(Resource):
         logger.info(f'[COMPLEX MODEL] API; ModelFull sending the response')
 
         return {'results': result}
+
+
+@ns3.route('/')
+class TodoList(Resource):
+
+    @ns3.doc('trigger_model')
+    @ns3.param('claim', _in='query')
+    @ns3.marshal_with(response_aggregated)
+    def get(self):
+        start_time = datetime.datetime.now()
+        claim = request.args.get('claim')
+        claim = check_if_none(claim)
+
+        logger.info(f'Query with params={{text: {claim}}}')
+        result = complex_model.predict_and_aggregate(claim)
+
+        end_time = datetime.datetime.now()
+        dif_time = str(end_time - start_time)
+
+        logger.info(f'[COMPLEX MODEL. Aggregated] API; ModelFull Get response; difference: {dif_time}')
+        logger.info(f'[COMPLEX MODEL. Aggregated] API; ModelFull sending the response')
+
+        return result
 
     # def put(self):
     #     print(complex_model.profiler.times_global)
