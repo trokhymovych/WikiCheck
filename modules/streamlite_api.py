@@ -3,35 +3,31 @@ import json
 from argparse import ArgumentParser
 from pathlib import Path
 sys.path.insert(0, "/Users/ntr/Documents/tresh/fairapi")
-# sys.path.insert(0, "/home/trokhymovych/fairapi")
 
 import streamlit as st
-from annotated_text import annotated_text
+# from annotated_text import annotated_text
 from colour import Color
 
 
 @st.cache(allow_output_mutation=True)
 def get_converters():
     from modules.model_complex import WikiFactChecker
-    from modules.utils.logging_utils import get_logger, ROOT_LOGGER_NAME
+    from modules.utils.logging_utils import get_logger, ROOT_LOGGER_NAME, DEFAULT_LOGGER
 
     parser = ArgumentParser()
     parser.add_argument('--config', type=str, required=False,
-                        default='modules/configs/sentence_bert_config.json', help='path to config')
+                        default='configs/inference/sentence_bert_config.json', help='path to config')
 
     args = parser.parse_args()
     config_path = args.config
-    logger = get_logger(name=ROOT_LOGGER_NAME,
-                        console=True,
-                        log_level="INFO",
-                        propagate=False)
+    logger = DEFAULT_LOGGER
 
     logger.info(f"Reading config from {Path(config_path).absolute()}")
     with open(config_path) as con_file:
         config = json.load(con_file)
     logger.info(f"Using config {config}")
 
-    complex_model = WikiFactChecker(logger, **config)
+    complex_model = WikiFactChecker(config, logger=logger)
 
     return complex_model
 
@@ -60,16 +56,16 @@ def parse_results(res):
 
 
 def write_ui():
-    claim = st.text_input('Enter English sentence below and hit Enter', value="Moscow is a capital of Ukraine")
+    claim = st.text_input('Enter English sentence below and hit Enter', value="The Earth is flat.")
     if not claim:
         return
     complex_model = get_converters()
     results = complex_model.predict_all(claim)
-    articles = parse_results(results)
-
-    for k, v in articles.items():
-        st.markdown(f''' #### Article name: {k.replace('_', ' ')}''')
-        annotated_text(v)
+    st.markdown(f''' #### Results:''')
+    st.markdown(f"```json{results[:5]}```")
+    # for k, v in articles.items():
+    #     st.markdown(f''' #### Article name: {k.replace('_', ' ')}''')
+    #     annotated_text(v)
 
 
 def write_footer():

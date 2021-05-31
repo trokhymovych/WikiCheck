@@ -49,7 +49,7 @@ class SentenceNLIModel:
                 'entailment_prob': probs[1],
                 'neutral_prob': probs[2]}
 
-    def predict_batch(self, texts, hypothesis):
+    def predict_batch(self, texts, hypothesis, return_cosine: bool = False):
 
         if isinstance(hypothesis, str):
             raise AttributeError("Hypothesis should be a list in case of batch processing.")
@@ -67,13 +67,21 @@ class SentenceNLIModel:
         embeddings_hypothesis = self.bert_model.encode(hypothesis, show_progress_bar=False, convert_to_numpy=False)
         self.profiler.finish_measure_local()
 
+        cosines = []
+        if return_cosine:
+            cos = torch.nn.CosineSimilarity(dim=0, eps=1e-6)
+            for e_claim, e_hypothesis in zip(embeddings_texts, embeddings_hypothesis):
+                cosines.append(cos(e_claim, e_hypothesis).item())
+
         results = []
         self.profiler.start_measure_local('classification')
         for embeddings in zip(embeddings_texts, embeddings_hypothesis):
             stacked_features = self._vector_stacking_logic(embeddings)
             results.append(self._normalize_probs(self.classification_model(stacked_features).detach().cpu().numpy()))
+
         self.profiler.finish_measure_local()
-        return results
+
+        return {'probs': results, 'cosines': cosines}
 
     @staticmethod
     def _vector_stacking_logic(vectors) -> np.array:
