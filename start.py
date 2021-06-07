@@ -83,10 +83,10 @@ class TodoList(Resource):
     @ns1.marshal_list_with(response)
     def get(self):
         start_time = datetime.datetime.now()
-        text = request.args.get('text')
+        claim = request.args.get('claim')
         hypothesis = request.args.get('hypothesis')
 
-        text = check_if_none(text)
+        text = check_if_none(claim)
         hypothesis = check_if_none(hypothesis)
 
         logger.info(f'Query with params={{text: {text}, hypothesis: {hypothesis}}}')
