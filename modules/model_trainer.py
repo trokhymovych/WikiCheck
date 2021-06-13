@@ -15,9 +15,8 @@ from fairapi.modules.snli_utils import _create_examples_fever, _create_examples_
 
 class BertTrainer:
     """
-    Class to train Bert model
+    Class to train NLI model
     :param logger: logger to use in model
-    # TODO Finish it
     """
 
     def __init__(self, logger: Logger, train_path: str, dev_path: str, test_path: str, base_model: str,
@@ -43,25 +42,26 @@ class BertTrainer:
     def initialize_model(self):
         # Read the dataset
         # Use BERT for mapping tokens to embeddings
-
         word_embedding_model = models.Transformer(self.base_model, max_seq_length=128)
-
         # Apply mean pooling to get one fixed sized sentence vector
         pooling_model = models.Pooling(word_embedding_model.get_word_embedding_dimension(),
                                        pooling_mode_mean_tokens=True,
                                        pooling_mode_cls_token=False,
                                        pooling_mode_max_tokens=False)
         self.model = SentenceTransformer(modules=[word_embedding_model, pooling_model])
-
         self.train_loss_nli = losses.SoftmaxLoss(model=self.model,
                                                  sentence_embedding_dimension=self.model.get_sentence_embedding_dimension(),
                                                  num_labels=len(self.label2int))
 
     def preparing_data(self):
+        """
+        Method used for data preparation before training
+        it reads data from files predefined in config and process them
+        Uses for SNLI data format
+        """
         train_snli = _create_examples_snli(_read_tsv(self.train_path), 'train_s')
         dev_snli = _create_examples_snli(_read_tsv(self.dev_path), 'dev_s')
         test_snli = _create_examples_snli(_read_tsv(self.test_path), 'test_s')
-
         # Convert the dataset to a DataLoader ready for training
         self.logger.info("Read train dataset")
 
@@ -87,6 +87,11 @@ class BertTrainer:
         self.test_dataloader_nli = DataLoader(test_data_nli, shuffle=True, batch_size=self.batch_size)
 
     def preparing_data_fever(self):
+        """
+        Method used for data preparation before training
+        it reads data from files predefined in config and process them
+        Uses for FEVER SNLI-style data format
+        """
         def read_fever(path):
             df = pd.read_csv(path)
             df.dropna(inplace=True)
@@ -122,6 +127,11 @@ class BertTrainer:
         self.test_dataloader_nli = DataLoader(test_data_nli, shuffle=True, batch_size=self.batch_size)
 
     def preparing_data_mnli(self):
+        """
+         Method used for data preparation before training
+         it reads data from files predefined in config and process them
+         Uses for MNLI data format
+        """
         def read_mnli(path):
             df = pd.read_table(path, error_bad_lines=False)
             df.sentence1 = df.sentence1.astype(str)
@@ -162,10 +172,16 @@ class BertTrainer:
         self.test_dataloader_nli = DataLoader(test_data_nli, shuffle=True, batch_size=self.batch_size)
 
     def save_model(self):
+        """
+        Method used for model saving
+        """
         torch.save(self.train_loss_nli.classifier.cpu(), self.path_to_save + 'classifier_model')
         self.model.save(self.path_to_save + "bert_model_trained")
 
     def load_model(self, text_model_path, classifier_path):
+        """
+        Method used for pretrained model loading
+        """
         self.model = SentenceTransformer(text_model_path)
         self.classification_model = torch.load(classifier_path)
         self.train_loss_nli = losses.SoftmaxLoss(model=self.model,
@@ -174,6 +190,9 @@ class BertTrainer:
         self.train_loss_nli.classifier = self.classification_model
 
     def train_model(self, number_of_epochs=1):
+        """
+        Method implements model training process
+        """
         warmup_steps = 10000
         self.logger.info("Warmup-steps: {}".format(warmup_steps))
         train_objectives = [(self.train_dataloader_nli, self.train_loss_nli)]

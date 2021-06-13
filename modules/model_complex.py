@@ -42,7 +42,13 @@ class WikiFactChecker:
         else:
             self.logger.info("Aggregation stage is not loaded")
 
-    def predict_all(self, claim):
+    def predict_all(self, claim: str):
+        """
+        Complex method that given a claim connect model level one and model level two
+        in order to make the final prediction in for of list of results.
+        :param claim, the string, text that should be fact-checked
+        :return the list of results
+        """
 
         self.profiler.begin_sample(claim)
 
@@ -74,7 +80,14 @@ class WikiFactChecker:
         self.profiler.end_sample()
         return sorted_results
 
-    def predict_and_aggregate(self, claim):
+    def predict_and_aggregate(self, claim: str):
+        """
+        Complex method that given a claim connect model level one and model level two
+        the same as in predict_all method but also adds aggregation level on top
+         in order to make the final prediction in form of one label and list of evidences.
+        :param claim, the string, text that should be fact-checked
+        :return dict of final label and evidences
+        """
         hypothesis = self.model_level_one.get_candidates(claim)
 
         all_sentences = []
@@ -106,6 +119,9 @@ class WikiFactChecker:
         return self.strategy_catboost(sorted_results)
 
     def strategy_catboost(self, res):
+        """
+        Method that implements aggregation strategy using catboost models
+        """
         k = 10
         led = {'SUPPORTS': 1, 'REFUTES': 0}
         try:

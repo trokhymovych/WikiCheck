@@ -35,8 +35,10 @@ class SentenceNLIModel:
         self.int2label = {v: k for k, v in self.label2int.items()}
         self.logger.info(f"Labels encoding is {self.label2int}")
 
-    def predict(self, text="", hypothesis=""):
-
+    def predict(self, text: str = "", hypothesis: str = ""):
+        """
+        Method used to predict relation between pair of texts.
+        """
         embeddings = self.bert_model.encode([text, hypothesis], show_progress_bar=False, convert_to_numpy=False)
         stacked_features = self._vector_stacking_logic(embeddings)
 
