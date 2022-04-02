@@ -3,6 +3,11 @@
 Repository with the implementation of WikiCheck API. 
 The project is done in cooperation with Wikimedia Foundation and Ukrainian Catholic University. 
 
+The work was accepted to CIKM2021 applied track. 
+
+The publication can be found here: 
+WikiCheck: An end-to-end open source Automatic Fact-Checking API based on Wikipedia (https://arxiv.org/abs/2109.00835)
+
 The link to API: https://nli.wmcloud.org
 
 #### The structure of the project: 
