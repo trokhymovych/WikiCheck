@@ -100,7 +100,8 @@ class TodoList(Resource):
             "model_name": "MODEL_LEVEL_TWO",
             "request": str({"text": text, "hypothesis": hypothesis}),
             "response": str(result),
-            "time_spend": str(dif_time)
+            "time_spend": str(dif_time),
+            "ip": str(request.remote_addr)
         }
         file_logger.add_log(params_to_log)
 
@@ -133,7 +134,8 @@ class TodoList(Resource):
             "model_name": "COMPLEX_MODEL",
             "request": str({"claim": claim}),
             "response": str({'results': result[:10]}),
-            "time_spend": str(dif_time)
+            "time_spend": str(dif_time),
+            "ip": str(request.remote_addr)
         }
         file_logger.add_log(params_to_log)
 
@@ -165,7 +167,8 @@ class TodoList(Resource):
             "model_name": "COMPLEX_MODEL_AGGREGATED",
             "request": str({"claim": claim}),
             "response": str(result),
-            "time_spend": str(dif_time)
+            "time_spend": str(dif_time),
+            "ip": str(request.remote_addr)
         }
         file_logger.add_log(params_to_log)
 
