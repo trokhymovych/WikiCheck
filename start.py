@@ -10,7 +10,7 @@ from pathlib import Path
 
 from modules.model_complex import WikiFactChecker
 from modules.model_level_two import SentenceNLIModel
-from modules.utils.logging_utils import get_logger, check_if_none, ROOT_LOGGER_NAME
+from modules.utils.logging_utils import get_logger, check_if_none, ROOT_LOGGER_NAME, CSVLogger
 
 parser = ArgumentParser()
 parser.add_argument('--config', type=str, required=False,
@@ -32,6 +32,7 @@ logger.info(f"Using config {config}")
 
 logger.info(f"Loading models ...")
 complex_model = WikiFactChecker(config, logger=logger)
+file_logger = CSVLogger(config)
 logger.info(f"Models loaded.")
 
 app = Flask(__name__)
@@ -94,6 +95,15 @@ class TodoList(Resource):
         logger.info(f'[MODEL_LEVEL_TWO] API; ModelOne Get response; difference: {dif_time}')
         logger.info(f'[MODEL_LEVEL_TWO] API; ModelFull sending the response')
 
+        params_to_log = {
+            "datetime": str(datetime.datetime.now()),
+            "model_name": "MODEL_LEVEL_TWO",
+            "request": str({"text": text, "hypothesis": hypothesis}),
+            "response": str(result),
+            "time_spend": str(dif_time)
+        }
+        file_logger.add_log(params_to_log)
+
         return result
 
 
@@ -118,6 +128,15 @@ class TodoList(Resource):
         logger.info(f'[COMPLEX MODEL] API; ModelFull Get response; difference: {dif_time}')
         logger.info(f'[COMPLEX MODEL] API; ModelFull sending the response')
 
+        params_to_log = {
+            "datetime": str(datetime.datetime.now()),
+            "model_name": "COMPLEX_MODEL",
+            "request": str({"claim": claim}),
+            "response": str({'results': result[:10]}),
+            "time_spend": str(dif_time)
+        }
+        file_logger.add_log(params_to_log)
+
         return {'results': result}
 
 
@@ -140,6 +159,15 @@ class TodoList(Resource):
 
         logger.info(f'[COMPLEX MODEL. Aggregated] API; ModelFull Get response; difference: {dif_time}')
         logger.info(f'[COMPLEX MODEL. Aggregated] API; ModelFull sending the response')
+
+        params_to_log = {
+            "datetime": str(datetime.datetime.now()),
+            "model_name": "COMPLEX_MODEL_AGGREGATED",
+            "request": str({"claim": claim}),
+            "response": str(result),
+            "time_spend": str(dif_time)
+        }
+        file_logger.add_log(params_to_log)
 
         return result
 
