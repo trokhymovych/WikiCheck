@@ -1,5 +1,5 @@
 {
-  "api_version": "0.2",
+  "api_version": "0.4",
   "measurer":{
         "mode_on": false
     },

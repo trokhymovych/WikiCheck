@@ -54,9 +54,6 @@ Also, you can train your model by running the ```modules/model_trainer.py``` scr
 
 
 ToDo:
-- [x] Refactor code for inference
-- [x] Write README.md
-- [ ] Refactor training script
-- [ ] Add training configs
-- [ ] Add notebooks with experiments
-- [ ] Add aggregation endpoint to API
+- [ ] Add logging solution
+- [ ] Update README
+- [ ] Add Licence
