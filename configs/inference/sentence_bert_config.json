@@ -1,5 +1,5 @@
 {
-  "api_version": "0.2",
+  "api_version": "0.4",
   "measurer":{
         "mode_on": false
     },
@@ -12,5 +12,6 @@
       "bert_model_path": "models/models_filtered/bart_fine/bert_model_trained/",
       "classification_model_path": "models/models_filtered/bart_fine/classifier_model"
     },
-  "aggregation": "models/aggregation_models.pickle"
+  "aggregation": "models/aggregation_models.pickle",
+  "log_file_path": "logs/"
 }

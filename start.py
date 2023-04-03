@@ -1,7 +1,6 @@
 import datetime
 import json
 from argparse import ArgumentParser
-# import sys
 
 from flask import Flask, request
 from werkzeug.middleware.proxy_fix import ProxyFix
@@ -9,13 +8,9 @@ from flask_restx import Api, Resource, fields
 from flask_cors import CORS
 from pathlib import Path
 
-# # for debug mode
-# sys.path.insert(0, "/Users/ntr/Documents/tresh/fairapi")
-# # sys.path.insert(0, "/home/trokhymovych/fairapi")
-
 from modules.model_complex import WikiFactChecker
 from modules.model_level_two import SentenceNLIModel
-from modules.utils.logging_utils import get_logger, check_if_none, ROOT_LOGGER_NAME
+from modules.utils.logging_utils import get_logger, check_if_none, ROOT_LOGGER_NAME, CSVLogger
 
 parser = ArgumentParser()
 parser.add_argument('--config', type=str, required=False,
@@ -37,19 +32,16 @@ logger.info(f"Using config {config}")
 
 logger.info(f"Loading models ...")
 complex_model = WikiFactChecker(config, logger=logger)
-multilingual = SentenceNLIModel(bert_model_path=config['model_level_two_ml']['bert_model_path'],
-                                classification_model_path=config['model_level_two_ml']['classification_model_path'],
-                                logger=logger)
+file_logger = CSVLogger(config)
 logger.info(f"Models loaded.")
 
 app = Flask(__name__)
 app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_port=1)
 CORS(app)
 
-api = Api(app, version=config.get("api_version", "0.0"), title='WikiCheck API')
+api = Api(app, version=config.get("api_version", "0.4"), title='WikiCheck API')
 
-ns0 = api.namespace('nli_model_multilingual', description=config.get('model_name', 'Wikipedia NLI model'))
-ns1 = api.namespace('nli_model', description=config.get('model_name', 'Wikipedia NLI model'))
+ns1 = api.namespace('nli_model', description=config.get('model_name', 'NLI model'))
 ns2 = api.namespace('fact_checking_model', description='Fact checking model')
 ns3 = api.namespace('fact_checking_aggregated', description='Fact checking model with aggregation')
 
@@ -79,33 +71,6 @@ response_aggregated = api.model("Aggregated_result", {
     'predicted_evidence': fields.List(fields.List(fields.String()))
 })
 
-@ns0.route('/')
-class TodoList(Resource):
-
-    @ns0.doc('trigger_model')
-    @ns0.param('claim', _in='query')
-    @ns0.param('hypothesis', _in='query')
-    @ns0.marshal_list_with(response)
-    def get(self):
-        start_time = datetime.datetime.now()
-        claim = request.args.get('claim')
-        hypothesis = request.args.get('hypothesis')
-
-        text = check_if_none(claim)
-        hypothesis = check_if_none(hypothesis)
-
-        logger.info(f'Query with params={{text: {text}, hypothesis: {hypothesis}}}')
-        result = multilingual.predict(text, hypothesis)
-
-        end_time = datetime.datetime.now()
-        dif_time = str(end_time - start_time)
-
-        logger.info(f'[MULTILINGUAL] API; ModelOne Get response; difference: {dif_time}')
-        logger.info(f'[MULTILINGUAL] API; ModelFull sending the response')
-
-        return result
-
-
 @ns1.route('/')
 class TodoList(Resource):
 
@@ -125,10 +90,20 @@ class TodoList(Resource):
         result = complex_model.model_level_two.predict(text, hypothesis)
 
         end_time = datetime.datetime.now()
-        dif_time = str(end_time - start_time)
+        dif_time = str((end_time - start_time).total_seconds())
 
         logger.info(f'[MODEL_LEVEL_TWO] API; ModelOne Get response; difference: {dif_time}')
         logger.info(f'[MODEL_LEVEL_TWO] API; ModelFull sending the response')
+
+        params_to_log = {
+            "datetime": str(datetime.datetime.now()),
+            "model_name": "MODEL_LEVEL_TWO",
+            "request": str({"text": text, "hypothesis": hypothesis}),
+            "response": str(result),
+            "time_spend": str(dif_time),
+            "ip": str(request.remote_addr)
+        }
+        file_logger.add_log(params_to_log)
 
         return result
 
@@ -149,10 +124,20 @@ class TodoList(Resource):
         result = complex_model.predict_all(claim)
 
         end_time = datetime.datetime.now()
-        dif_time = str(end_time - start_time)
+        dif_time = str((end_time - start_time).total_seconds())
 
         logger.info(f'[COMPLEX MODEL] API; ModelFull Get response; difference: {dif_time}')
         logger.info(f'[COMPLEX MODEL] API; ModelFull sending the response')
+
+        params_to_log = {
+            "datetime": str(datetime.datetime.now()),
+            "model_name": "COMPLEX_MODEL",
+            "request": str({"claim": claim}),
+            "response": str({'results': result[:10]}),
+            "time_spend": str(dif_time),
+            "ip": str(request.remote_addr)
+        }
+        file_logger.add_log(params_to_log)
 
         return {'results': result}
 
@@ -172,16 +157,22 @@ class TodoList(Resource):
         result = complex_model.predict_and_aggregate(claim)
 
         end_time = datetime.datetime.now()
-        dif_time = str(end_time - start_time)
+        dif_time = str((end_time - start_time).total_seconds())
 
         logger.info(f'[COMPLEX MODEL. Aggregated] API; ModelFull Get response; difference: {dif_time}')
         logger.info(f'[COMPLEX MODEL. Aggregated] API; ModelFull sending the response')
 
-        return result
+        params_to_log = {
+            "datetime": str(datetime.datetime.now()),
+            "model_name": "COMPLEX_MODEL_AGGREGATED",
+            "request": str({"claim": claim}),
+            "response": str(result),
+            "time_spend": str(dif_time),
+            "ip": str(request.remote_addr)
+        }
+        file_logger.add_log(params_to_log)
 
-    # def put(self):
-    #     print(complex_model.profiler.times_global)
-    #     complex_model.dump_time_stats()
+        return result
 
 
 if __name__ == '__main__':

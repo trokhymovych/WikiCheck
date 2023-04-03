@@ -1,6 +1,8 @@
 from typing import *
 import logging
 from pathlib import Path
+from datetime import datetime
+import csv
 
 from modules.utils.measurer import TimeMeasurer
 
@@ -62,3 +64,18 @@ def check_if_none(x):
         return x
     else:
         return ""
+
+class CSVLogger:
+    def __init__(self, config):
+        date_string = datetime.today().strftime('%Y-%m-%d')
+        self.file_path = f"{config['log_file_path']}logs_{date_string}.csv"
+        self.fields = ["datetime", "model_name", "request", "response", "time_spend", "ip"]
+        with open(self.file_path, 'w') as outfile:
+            writer = csv.writer(outfile)
+            writer.writerow(self.fields)
+
+    def add_log(self, log_attributes: dict):
+        log_string = [log_attributes.get(f) for f in self.fields]
+        with open(self.file_path, 'a') as outfile:
+            writer = csv.writer(outfile)
+            writer.writerow(log_string)

@@ -1,13 +1,13 @@
 wikipedia==1.4.0
-Flask==1.1.2
+Flask==2.2.3
 tqdm==4.60.0
 pandas==1.2.3
 torch==1.7.1
 nltk==3.5
 flair==0.8.0.post1
-flask_restx==0.2.0
+flask_restx==1.1.0
 sentence_transformers==0.4.1
 Flask_Cors==3.0.10
-numpy==1.19.5
+numpy==1.24.2
 pymediawiki
 catboost
