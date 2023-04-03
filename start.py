@@ -90,7 +90,7 @@ class TodoList(Resource):
         result = complex_model.model_level_two.predict(text, hypothesis)
 
         end_time = datetime.datetime.now()
-        dif_time = str(end_time - start_time)
+        dif_time = str((end_time - start_time).total_seconds())
 
         logger.info(f'[MODEL_LEVEL_TWO] API; ModelOne Get response; difference: {dif_time}')
         logger.info(f'[MODEL_LEVEL_TWO] API; ModelFull sending the response')
@@ -124,7 +124,7 @@ class TodoList(Resource):
         result = complex_model.predict_all(claim)
 
         end_time = datetime.datetime.now()
-        dif_time = str(end_time - start_time)
+        dif_time = str((end_time - start_time).total_seconds())
 
         logger.info(f'[COMPLEX MODEL] API; ModelFull Get response; difference: {dif_time}')
         logger.info(f'[COMPLEX MODEL] API; ModelFull sending the response')
@@ -157,7 +157,7 @@ class TodoList(Resource):
         result = complex_model.predict_and_aggregate(claim)
 
         end_time = datetime.datetime.now()
-        dif_time = str(end_time - start_time)
+        dif_time = str((end_time - start_time).total_seconds())
 
         logger.info(f'[COMPLEX MODEL. Aggregated] API; ModelFull Get response; difference: {dif_time}')
         logger.info(f'[COMPLEX MODEL. Aggregated] API; ModelFull sending the response')
