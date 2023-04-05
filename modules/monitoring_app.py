@@ -94,7 +94,7 @@ data = get_logs()
 time_metrics_dict = data.groupby("model_name")["time_spend"].mean().to_dict()
 for k, v in time_metrics_dict.items():
     with row0_1:
-        st.metric(f"{k}   mean response time", round(v, 2), delta=None, label_visibility="visible")
+        st.metric(f"{k}   mean response time", round(v, 2))
 
 with row0_2:
     st.write(get_logs().tail(100))
