@@ -69,7 +69,7 @@ class CSVLogger:
     def __init__(self, config):
         date_string = datetime.today().strftime('%Y-%m-%d')
         self.file_path = f"{config['log_file_path']}logs_{date_string}.csv"
-        self.fields = ["datetime", "model_name", "request", "response", "time_spend", "ip"]
+        self.fields = ["datetime", "model_name", "request", "response", "time_spend", "cookie"]
         with open(self.file_path, 'w') as outfile:
             writer = csv.writer(outfile)
             writer.writerow(self.fields)

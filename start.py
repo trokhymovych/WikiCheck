@@ -9,7 +9,6 @@ from flask_cors import CORS
 from pathlib import Path
 
 from modules.model_complex import WikiFactChecker
-from modules.model_level_two import SentenceNLIModel
 from modules.utils.logging_utils import get_logger, check_if_none, ROOT_LOGGER_NAME, CSVLogger
 
 parser = ArgumentParser()
@@ -101,7 +100,7 @@ class TodoList(Resource):
             "request": str({"text": text, "hypothesis": hypothesis}),
             "response": str(result),
             "time_spend": str(dif_time),
-            "ip": str(request.remote_addr)
+            "cookie": str(request.environ.get("HTTP_COOKIE", "anon"))
         }
         file_logger.add_log(params_to_log)
 
@@ -135,7 +134,7 @@ class TodoList(Resource):
             "request": str({"claim": claim}),
             "response": str({'results': result[:10]}),
             "time_spend": str(dif_time),
-            "ip": str(request.remote_addr)
+            "cookie": str(request.environ.get("HTTP_COOKIE", "anon"))
         }
         file_logger.add_log(params_to_log)
 
@@ -168,7 +167,7 @@ class TodoList(Resource):
             "request": str({"claim": claim}),
             "response": str(result),
             "time_spend": str(dif_time),
-            "ip": str(request.remote_addr)
+            "cookie": str(request.environ.get("HTTP_COOKIE", "anon"))
         }
         file_logger.add_log(params_to_log)
 

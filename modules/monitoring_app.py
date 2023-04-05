@@ -63,7 +63,7 @@ with row0_1:
 
 with row0_2:
     data = get_logs()
-    df_agg = data.groupby(["model_name", "date"])["ip"].nunique().reset_index()
+    df_agg = data.groupby(["model_name", "date"])["cookie"].nunique().reset_index()
     df_agg.columns = ["model_name", "date", "number_of_unique_users"]
     df_agg["date"] = df_agg["date"].apply(str)
     df_agg.columns = ["model_name", "date", "number_of_unique_users"]
