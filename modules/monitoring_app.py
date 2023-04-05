@@ -6,8 +6,6 @@ import streamlit as st
 import glob
 import altair as alt
 from pandas import json_normalize
-from streamlit_extras.add_vertical_space import add_vertical_space
-from streamlit_extras.altex import line_chart, get_stocks_data
 from streamlit_lottie import st_lottie
 
 # Header organisation
@@ -28,7 +26,7 @@ row0_1.title(" WikiCheck analytics page ")
 
 # Adding plots:
 # Loading the data:
-@st.cache_data
+@st.cache
 def get_logs():
     last_log_filename = np.sort(glob.glob("logs/*.csv"))[-1]
     data = pd.read_csv(last_log_filename)
