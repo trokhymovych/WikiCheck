@@ -3,11 +3,7 @@
 [![Wikipedia](https://img.shields.io/badge/Wikipedia-%23000000.svg?style=for-the-badge&logo=wikipedia&logoColor=white)](https://meta.wikimedia.org/wiki/Research:Implementing_a_prototype_for_Automatic_Fact_Checking_in_Wikipedia)
 # WikiCheck API
 
-
-
 Repository with the implementation of WikiCheck API, end-to-end open source Automatic Fact-Checking based on Wikipedia.
-
-The project is done in cooperation with Wikimedia Foundation and Ukrainian Catholic University. 
 
 The research was published in **CIKM2021** applied track:
 - *Trokhymovych, Mykola, and Diego Saez-Trumper.* 
@@ -29,8 +25,7 @@ The **configs** directory includes configuration files for training and inferenc
 
 The **notebooks** directory includes .ipynb notebooks with experiments done during the research.
 
-We use DVC with Google drive remote for efficient model version control. 
-If you want to get access to our fine-tuned models, you can load them from  [![Google Drive](https://img.shields.io/badge/Google%20Drive-4285F4?style=for-the-badge&logo=googledrive&logoColor=white)](https://drive.google.com/drive/folders/1ABnPliL2ouDX7vK9RpaUZLLawxPRRgyb?usp=sharing)
+If you want to get access to our fine-tuned models, you can load them from Zenodo [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.11570607.svg)](https://doi.org/10.5281/zenodo.11570607)
 
 
 Also, you can train your model by running the ```modules/model_trainer.py``` script. 
@@ -55,11 +50,11 @@ Also, you can train your model by running the ```modules/model_trainer.py``` scr
 ```pip install -r requirements.txt```
 
 - Load pretrained models. There are two options: 
-    - Loading models with DVC (preferred):
+    - Loading models with DVC (depreciated):
 
     ```dvc pull``` 
     
-    - Loading models from [![Google Drive](https://img.shields.io/badge/Google%20Drive-4285F4?style=for-the-badge&logo=googledrive&logoColor=white)](https://drive.google.com/drive/folders/1ABnPliL2ouDX7vK9RpaUZLLawxPRRgyb?usp=sharing)
+    - Loading models from Zenodo [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.11570607.svg)](https://doi.org/10.5281/zenodo.11570607)
 
 - Run the API:
 
