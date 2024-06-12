@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+    <style>
+        /* Add your CSS styles here */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 100;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            text-align: left;
+        }
+        h1 {
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>{{ title }}</h1>
+        <p>{{ description }}</p>
+        <div>
+            <h2>Metadata</h2>
+            <p>{{ metadata }}</p>
+        </div>
+        <div>
+            <h2>Documentation</h2>
+            <ul>
+                <li><a href="{{ docs_link }}">API Documentation link (Swagger)</a></li>
+            </ul>
+            <p>To request credentials to access the API, please contact <a href="mailto:mykola.trokhymovych@upf.edu">mykola.trokhymovych@upf.edu</a>.<p>
+            <p>When requesting access, please include the following information:</p>
+            <p><strong>Subject:</strong> Request for API access</p>
+            <p><strong>Body:</strong>
+            <p>Dear Mykola,</p>
+            <p>I would like to request access to the API for the purpose of <strong>[insert purpose here]</strong>.
+            <p>I need <strong>[insert number of requests]</strong> (e.g., 100) requests for the purpose of testing the tool.</p>
+        </div>
+    </div>
+</body>
+</html>

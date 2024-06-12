@@ -1,5 +1,5 @@
 {
-  "api_version": "0.4",
+  "version": "1.0.0",
   "measurer":{
         "mode_on": false
     },
@@ -13,5 +13,8 @@
       "classification_model_path": "models/models_filtered/bart_fine/classifier_model"
     },
   "aggregation": "models/aggregation_models.pickle",
-  "log_file_path": "logs/"
+  "log_file_path": "logs/",
+  "title": "WikiCheck API",
+  "description": "Prototype of fact checking tool based on Wikipedia data",
+  "data_logs_path": "logs/data_logs.log"
 }

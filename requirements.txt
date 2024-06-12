@@ -11,3 +11,6 @@ Flask_Cors==3.0.10
 numpy==1.24.2
 pymediawiki
 catboost
+starlette==0.37.2
+fastapi
+uvicorn

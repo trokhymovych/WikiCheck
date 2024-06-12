@@ -3,6 +3,8 @@ import logging
 from pathlib import Path
 from datetime import datetime
 import csv
+import json
+import os
 
 from modules.utils.measurer import TimeMeasurer
 
@@ -17,6 +19,24 @@ DEFAULT_FORMAT_PARAMS = dict(
 ROOT_LOGGER_NAME = 'NLI_API'
 
 DEFAULT_LOGGER = logging.getLogger("DEFAULT")
+
+
+class DataLoggerFile:
+    """
+    Class that implements data logging to file
+    It takes dictionary and writes it to file
+    """
+
+    def __init__(self, file_path: str) -> None:
+        self.file_path = file_path
+        # Check if file exist and create if not:
+        if not os.path.exists(file_path):
+            with open(file_path, "w") as f:
+                f.write("")
+
+    def write(self, data: dict) -> None:
+        with open(self.file_path, "a") as f:
+            f.write(json.dumps(data) + "\n")
 
 
 def get_logger(name: str,
