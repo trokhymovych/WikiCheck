@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta, timezone
-from typing import Annotated, Optional, Union
+from typing import Optional, Union
+from typing_extensions import Annotated
 
 import jwt
 
