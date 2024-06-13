@@ -27,7 +27,7 @@ from modules.entities import (
     NLIRequest,
     NLIResponse,
     FactCheckResponse,
-    ClaimFactCheckResponse
+    FactCheckNOResponse
 )
 
 from fastapi.responses import HTMLResponse
@@ -99,16 +99,33 @@ async def add_process_time_header(request: Request, call_next):
     response = await call_next(request)
     process_time = round(time.time() - start_time, 4)
     response.headers["X-Process-Time"] = str(process_time)
+
+    body = b""
+    if hasattr(response, "body"):
+        body = response.body
+    elif hasattr(response, "body_iterator"):
+        async for chunk in response.body_iterator:
+            if not isinstance(chunk, bytes):
+                chunk = chunk.encode(response.charset)
+            body += chunk
+    content = body.decode("utf-8")
+
     data_log = {
         "id": response.headers.get("X-request-ID", "unknown"),
         "path": request.url.path,
+        "response": content,
+        "user": response.headers.get("X-user", "unknown"),
         "time": datetime.now().strftime("%Y-%m-%d, %H:%M"),
         "process_time": process_time,
         "status_code": response.status_code,
     }
     task = BackgroundTask(data_logger.write, data_log)
-    response.background = task
-    return response
+    return Response(
+            content=body,
+            status_code=response.status_code,
+            headers=dict(response.headers),
+            background=task
+        )
 
 
 @app.get("/", response_class=HTMLResponse, include_in_schema=False)
@@ -156,20 +173,12 @@ async def get_nli_prediction(
     try:
         # Step 2: Prediction:
         result = complex_model.model_level_two.predict(claim, hypothesis)
-
-        # Step 3: Log the data
-        data_log = {
-            "id": response.headers["X-request-ID"],
-            "time": datetime.now().strftime("%Y-%m-%d, %H:%M"),
-            "request": str({"text": claim, "hypothesis": hypothesis}),
-            "response": result,
-            "user": "None",
-        }
-        background_tasks.add_task(data_logger.write, data=data_log)
+        result["request"] = str({"text": claim, "hypothesis": hypothesis})
         return result
     except Exception as e:
         data_log = {
             "id": response.headers["X-request-ID"],
+            "path": "/get-nli-prediction/",
             "reason": str(e),
             "time": datetime.now().strftime("%Y-%m-%d, %H:%M"),
             "request": str({"text": claim, "hypothesis": hypothesis}),
@@ -190,27 +199,24 @@ async def get_fact_check_non_aggregated(
     response: Response,
     background_tasks: BackgroundTasks,
     current_user: Annotated[User, Depends(validate_user)],
-) -> List[ClaimFactCheckResponse]: 
+) -> FactCheckNOResponse: 
     response.headers["X-request-ID"] = str(uuid4())
     response.headers["X-user"] = current_user.username
     claim_text = check_if_none(claim.text)
     try:
         result = complex_model.predict_all(claim_text)
-        data_log = {
-            "id": response.headers["X-request-ID"],
-            "time": datetime.now().strftime("%Y-%m-%d, %H:%M"),
+        result_final = {
             "request": claim_text,
-            "response": str({'results': result[:10]}),
-            "user": current_user.username,
+            "predicted_evidence": result,
         }
-        background_tasks.add_task(data_logger.write, data=data_log)
         # Update user credits
         update_user_credits(current_user.username, -1)
-        return result
+        return result_final
     except Exception as e:
         data_log = {
             "id": response.headers["X-request-ID"],
             "reason": str(e),
+            "path": "/get-fact-check-non-aggregated/",
             "time": datetime.now().strftime("%Y-%m-%d, %H:%M"),
             "request": claim_text,
             "response": None,
@@ -236,15 +242,7 @@ async def get_fact_check_aggregated_base(
     claim_text = check_if_none(claim.text)
     try:
         result = complex_model.predict_and_aggregate(claim_text)
-
-        data_log = {
-            "id": response.headers["X-request-ID"],
-            "time": datetime.now().strftime("%Y-%m-%d, %H:%M"),
-            "request": claim_text,
-            "response": result,
-            "user": current_user.username,
-        }
-        background_tasks.add_task(data_logger.write, data=data_log)
+        result["request"] = claim_text
         # Update user credits
         update_user_credits(current_user.username, -1)
         return result
@@ -252,6 +250,7 @@ async def get_fact_check_aggregated_base(
         data_log = {
             "id": response.headers["X-request-ID"],
             "reason": str(e),
+            "path": "/get-fact-check-aggregated-base/",
             "time": datetime.now().strftime("%Y-%m-%d, %H:%M"),
             "request": claim_text,
             "response": None,

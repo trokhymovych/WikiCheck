@@ -1,4 +1,4 @@
-from typing import Optional, Union, List
+from typing import Any, Optional, Union, List
 from pydantic import BaseModel  # type: ignore
 
 
@@ -18,6 +18,7 @@ class NLIRequest(BaseModel):
 
 
 class NLIResponse(BaseModel):
+    request: str
     label: str
     contradiction_prob: float
     entailment_prob: float
@@ -35,8 +36,14 @@ class ClaimFactCheckResponse(BaseModel):
 
 
 class FactCheckResponse(BaseModel):
+    request: str
     predicted_label: str
     predicted_evidence: List[List[str]]
+
+
+class FactCheckNOResponse(BaseModel):
+    request: str
+    predicted_evidence: List[ClaimFactCheckResponse]
 
 
 class TokenData(BaseModel):
