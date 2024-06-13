@@ -1,4 +1,4 @@
-from typing import Optional, Union
+from typing import Optional, Union, List
 from pydantic import BaseModel  # type: ignore
 
 
@@ -36,7 +36,7 @@ class ClaimFactCheckResponse(BaseModel):
 
 class FactCheckResponse(BaseModel):
     predicted_label: str
-    predicted_evidence: list[list[str]]
+    predicted_evidence: List[List[str]]
 
 
 class TokenData(BaseModel):
