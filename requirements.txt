@@ -9,8 +9,12 @@ flask_restx==1.1.0
 sentence_transformers==0.4.1
 Flask_Cors==3.0.10
 numpy==1.24.2
-pymediawiki
-catboost
+pymediawiki==0.7.0
+catboost==0.25.1
 starlette==0.37.2
-fastapi
-uvicorn
+fastapi==0.103.2
+uvicorn==0.22.0
+python-multipart==0.0.8
+pyjwt==2.8.0
+passlib==1.7.4
+bcrypt==4.1.3

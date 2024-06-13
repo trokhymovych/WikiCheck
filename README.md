@@ -49,16 +49,13 @@ Also, you can train your model by running the ```modules/model_trainer.py``` scr
 
 ```pip install -r requirements.txt```
 
-- Load pretrained models. There are two options: 
-    - Loading models with DVC (depreciated):
-
-    ```dvc pull``` 
+- Load pretrained models:
     
     - Loading models from Zenodo [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.11570607.svg)](https://doi.org/10.5281/zenodo.11570607)
 
 - Run the API:
 
-```python start.py --config configs/inference/sentence_bert_config.json```
+```python run.py --config configs/inference/sentence_bert_config.json```
 
 
 ## Citation
