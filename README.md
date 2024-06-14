@@ -25,7 +25,7 @@ The **configs** directory includes configuration files for training and inferenc
 
 The **notebooks** directory includes .ipynb notebooks with experiments done during the research.
 
-If you want to get access to our fine-tuned models, you can load them from Zenodo [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.11570607.svg)](https://doi.org/10.5281/zenodo.11570607)
+If you want to get access to our fine-tuned models, you can load them from Zenodo [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.11660051.svg)](https://doi.org/10.5281/zenodo.11660051)
 
 
 Also, you can train your model by running the ```modules/model_trainer.py``` script. 
@@ -51,7 +51,7 @@ Also, you can train your model by running the ```modules/model_trainer.py``` scr
 
 - Load pretrained models:
     
-    - Loading models from Zenodo [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.11570607.svg)](https://doi.org/10.5281/zenodo.11570607)
+    - Loading models from Zenodo [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.11660051.svg)](https://doi.org/10.5281/zenodo.11660051)
 
 - Run the API:
 
