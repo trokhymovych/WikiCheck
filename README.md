@@ -15,7 +15,7 @@ Association for Computing Machinery, 2021, pp. 4155–4164, CIKM ’21.
 - The preprint **WikiCheck: An End-to-End Open Source Automatic Fact-Checking API Based on Wikipedia**: [![DOI:10.48550/arXiv.2109.00835](https://zenodo.org/badge/DOI/10.48550/arXiv.2109.00835.svg)](
 https://doi.org/10.48550/arXiv.2109.00835)
 
-We encourage you to test the WikiCheck API by yourself: [![Website](https://img.shields.io/website?style=flat-square&down_color=red&down_message=offline&label=WikiCheck&logo=WikiCheck&style=plastic&up_color=green&up_message=online&url=https%3A%2F%2Fnli.wmflabs.org%2F)](https://nli.wmflabs.org/)
+We encourage you to test the WikiCheck API by yourself: [![Website](https://img.shields.io/website?style=flat-square&down_color=red&down_message=offline&label=WikiCheck&logo=WikiCheck&style=plastic&up_color=green&up_message=online&url=https://nli.wmcloud.org/docs)](https://nli.wmflabs.org/)
 
 ## Installation and Usage: 
 The project consists of **modules** directory with the implementation of modules 
