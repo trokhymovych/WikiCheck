@@ -2,8 +2,7 @@ import time
 import json
 from argparse import ArgumentParser
 from datetime import datetime, timedelta
-from typing import List
-from typing_extensions import Annotated
+from typing import Annotated, List
 from urllib.parse import urljoin
 from uuid import uuid4
 from pathlib import Path
