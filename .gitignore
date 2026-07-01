@@ -18,3 +18,8 @@ locks/*
 /notebooks/in_progress
 notebooks/.ipynb_checkpoints/
 /data
+
+# environment secrets
+backend/.env
+.env
+.venv

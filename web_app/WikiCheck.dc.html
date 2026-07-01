@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;height:100%;}
+body{font-family:'Geist',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;-webkit-font-smoothing:antialiased;}
+button{font-family:inherit;}
+input,textarea{font-family:inherit;}
+textarea{resize:none;}
+::placeholder{color:#A1A1AA;}
+*::-webkit-scrollbar{width:8px;height:8px;}
+*::-webkit-scrollbar-thumb{background:#E0E0E5;border-radius:8px;}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.45}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+</style>
+</helmet>
+
+<div style="position:fixed;inset:0;overflow:hidden;background:#FAFAFA;font-family:'Geist',-apple-system,sans-serif;">
+ <div style="position:relative;width:133.333vw;height:133.333vh;transform:scale(0.75);transform-origin:top left;background:#FAFAFA;color:#18181B;display:flex;flex-direction:column;align-items:center;">
+
+  <!-- ===================== APP ===================== -->
+  <div style="width:100%;max-width:1000px;height:100%;display:flex;flex-direction:column;padding:22px 28px 24px;gap:16px;">
+
+    <!-- top bar -->
+    <div style="display:flex;align-items:center;justify-content:space-between;flex:none;">
+      <div style="display:flex;align-items:center;gap:9px;">
+        <div style="width:24px;height:24px;border-radius:7px;background:#4F46E5;display:flex;align-items:center;justify-content:center;flex:none;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+        </div>
+        <span style="font-size:18px;letter-spacing:-0.02em;"><span style="font-weight:400;">Wiki</span><span style="font-weight:600;">Check</span></span>
+      </div>
+      <span style="font-size:12.5px;color:#A1A1AA;">Fact verification based on Wikipedia</span>
+    </div>
+
+    <!-- ALWAYS-VISIBLE COMPOSER -->
+    <div style="flex:none;display:flex;flex-direction:column;gap:8px;">
+      <div style="background:#fff;border:1px solid #E4E4E7;border-radius:14px;box-shadow:0 1px 3px rgba(0,0,0,.04);padding:12px 14px 10px;transition:.15s;{{ composerFocusStyle }}">
+        <textarea value="{{ claim }}" onChange="{{ onClaimInput }}" onFocus="{{ onFocus }}" onBlur="{{ onBlur }}" rows="2" placeholder="Check a factual claim — e.g. Neil Armstrong landed on the Moon in 1969" style="width:100%;border:none;outline:none;font-size:15px;line-height:1.5;color:#18181B;background:transparent;display:block;"></textarea>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:8px;">
+          <div style="display:none;align-items:center;gap:9px;min-width:0;">
+            <button onClick="{{ toggleMulti }}" style="position:relative;width:36px;height:21px;border-radius:999px;border:none;cursor:pointer;flex:none;transition:background .18s;background:{{ multiTrackBg }};">
+              <span style="position:absolute;top:3px;left:3px;width:15px;height:15px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.25);transition:transform .18s;transform:{{ multiKnobX }};"></span>
+            </button>
+            <span style="font-size:13px;color:#52525B;font-weight:500;flex:none;">Multilingual</span>
+            <sc-if value="{{ multilingual }}" hint-placeholder-val="{{ false }}">
+              <span style="font-size:11.5px;color:#A1A1AA;font-family:'Geist Mono',monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">DE · FR · ZH · ES · PT · UK</span>
+            </sc-if>
+          </div>
+          <button onClick="{{ runCheck }}" style="flex:none;display:flex;align-items:center;gap:7px;background:#4F46E5;color:#fff;border:none;border-radius:9px;padding:8px 16px;font-size:13.5px;font-weight:600;cursor:pointer;box-shadow:0 1px 2px rgba(79,70,229,.25);" style-hover="background:#4338CA;">
+            Check
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- quality hint -->
+      <div style="min-height:18px;display:flex;align-items:center;padding:0 2px;">
+        <sc-if value="{{ qualityGood }}" hint-placeholder-val="{{ false }}">
+          <span style="display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:#16A34A;font-weight:500;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+            Good claim — specific and verifiable
+          </span>
+        </sc-if>
+        <sc-if value="{{ qualityVague }}" hint-placeholder-val="{{ false }}">
+          <span style="display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:#D97706;font-weight:500;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 2 20h20L12 3Z"/><path d="M12 10v4"/><path d="M12 17h.01"/></svg>
+            Too vague — try adding a name, date, or place
+          </span>
+        </sc-if>
+        <sc-if value="{{ qualityEmpty }}" hint-placeholder-val="{{ true }}">
+          <span style="font-size:12.5px;color:#A1A1AA;">Searches Wikipedia · Results in ~3 seconds</span>
+        </sc-if>
+      </div>
+    </div>
+
+    <!-- ================= BELOW COMPOSER ================= -->
+
+    <!-- EMPTY -->
+    <sc-if value="{{ showEmpty }}" hint-placeholder-val="{{ true }}">
+      <div style="flex:none;display:flex;flex-direction:column;gap:10px;">
+        <p style="font-size:11px;color:#A1A1AA;margin:0;letter-spacing:0.04em;text-transform:uppercase;font-weight:600;">Try an example</p>
+        <div style="display:flex;flex-wrap:wrap;gap:9px;">
+          <button data-claim="The Eiffel Tower was built in 1887" onClick="{{ fillChip }}" style="border:1px solid #E4E4E7;background:#fff;color:#52525B;font-size:13px;padding:9px 15px;border-radius:999px;cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.03);" style-hover="border-color:#4F46E5;color:#4F46E5;background:#F5F3FF;">The Eiffel Tower was built in 1887</button>
+          <button data-claim="Aspirin was invented by Bayer" onClick="{{ fillChip }}" style="border:1px solid #E4E4E7;background:#fff;color:#52525B;font-size:13px;padding:9px 15px;border-radius:999px;cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.03);" style-hover="border-color:#4F46E5;color:#4F46E5;background:#F5F3FF;">Aspirin was invented by Bayer</button>
+          <button data-claim="The Amazon is the longest river" onClick="{{ fillChip }}" style="border:1px solid #E4E4E7;background:#fff;color:#52525B;font-size:13px;padding:9px 15px;border-radius:999px;cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.03);" style-hover="border-color:#4F46E5;color:#4F46E5;background:#F5F3FF;">The Amazon is the longest river</button>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- LOADING -->
+    <sc-if value="{{ showLoading }}" hint-placeholder-val="{{ false }}">
+      <div style="flex:1;min-height:0;display:flex;flex-direction:column;gap:12px;">
+        <div style="display:flex;align-items:center;justify-content:center;gap:18px;flex:none;flex-wrap:wrap;padding:2px 0;">
+          <sc-if value="{{ load0done }}" hint-placeholder-val="{{ false }}"><span style="display:inline-flex;align-items:center;gap:7px;font-size:12.5px;color:#16A34A;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>{{ searchLabel }}</span></sc-if>
+          <sc-if value="{{ load0active }}" hint-placeholder-val="{{ true }}"><span style="display:inline-flex;align-items:center;gap:7px;font-size:12.5px;color:#4F46E5;font-weight:500;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" style="animation:spin .8s linear infinite;"><circle cx="12" cy="12" r="9" stroke="#C7D2FE" stroke-width="3"/><path d="M21 12a9 9 0 0 0-9-9" stroke="#4F46E5" stroke-width="3" stroke-linecap="round"/></svg>{{ searchLabel }}</span></sc-if>
+          <span style="color:#D4D4D8;">·</span>
+          <sc-if value="{{ load1done }}" hint-placeholder-val="{{ false }}"><span style="display:inline-flex;align-items:center;gap:7px;font-size:12.5px;color:#16A34A;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Reranking {{ passageCount }} passages</span></sc-if>
+          <sc-if value="{{ load1active }}" hint-placeholder-val="{{ false }}"><span style="display:inline-flex;align-items:center;gap:7px;font-size:12.5px;color:#4F46E5;font-weight:500;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" style="animation:spin .8s linear infinite;"><circle cx="12" cy="12" r="9" stroke="#C7D2FE" stroke-width="3"/><path d="M21 12a9 9 0 0 0-9-9" stroke="#4F46E5" stroke-width="3" stroke-linecap="round"/></svg>Reranking {{ passageCount }} passages</span></sc-if>
+          <sc-if value="{{ load1pending }}" hint-placeholder-val="{{ true }}"><span style="display:inline-flex;align-items:center;gap:7px;font-size:12.5px;color:#C4C4CC;"><span style="width:13px;height:13px;border-radius:50%;border:2px solid #DEDEE3;"></span>Reranking passages</span></sc-if>
+          <span style="color:#D4D4D8;">·</span>
+          <sc-if value="{{ load2active }}" hint-placeholder-val="{{ false }}"><span style="display:inline-flex;align-items:center;gap:7px;font-size:12.5px;color:#4F46E5;font-weight:500;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" style="animation:spin .8s linear infinite;"><circle cx="12" cy="12" r="9" stroke="#C7D2FE" stroke-width="3"/><path d="M21 12a9 9 0 0 0-9-9" stroke="#4F46E5" stroke-width="3" stroke-linecap="round"/></svg>Running NLI verification</span></sc-if>
+          <sc-if value="{{ load2pending }}" hint-placeholder-val="{{ true }}"><span style="display:inline-flex;align-items:center;gap:7px;font-size:12.5px;color:#C4C4CC;"><span style="width:13px;height:13px;border-radius:50%;border:2px solid #DEDEE3;"></span>Running NLI verification</span></sc-if>
+        </div>
+        <div style="flex:1;min-height:0;display:flex;border:1px solid #E4E4E7;border-radius:12px;overflow:hidden;background:#fff;">
+          <div style="flex:1;padding:14px 16px;border-right:1px solid #E4E4E7;display:flex;flex-direction:column;gap:11px;">
+            <div style="font-size:12.5px;font-weight:600;color:#A1A1AA;">Supporting</div>
+            <div style="border:1px solid #EEE;border-radius:8px;padding:12px;display:flex;flex-direction:column;gap:8px;"><div style="height:12px;width:50%;border-radius:5px;background:#ECECEF;animation:pulse 1.4s ease-in-out infinite;"></div><div style="height:8px;width:30%;border-radius:5px;background:#F1F1F4;animation:pulse 1.4s ease-in-out infinite .1s;"></div><div style="height:8px;width:100%;border-radius:5px;background:#F1F1F4;animation:pulse 1.4s ease-in-out infinite .15s;"></div><div style="height:8px;width:90%;border-radius:5px;background:#F1F1F4;animation:pulse 1.4s ease-in-out infinite .2s;"></div></div>
+            <div style="border:1px solid #EEE;border-radius:8px;padding:12px;display:flex;flex-direction:column;gap:8px;"><div style="height:12px;width:44%;border-radius:5px;background:#ECECEF;animation:pulse 1.4s ease-in-out infinite .1s;"></div><div style="height:8px;width:28%;border-radius:5px;background:#F1F1F4;animation:pulse 1.4s ease-in-out infinite .2s;"></div><div style="height:8px;width:96%;border-radius:5px;background:#F1F1F4;animation:pulse 1.4s ease-in-out infinite .25s;"></div><div style="height:8px;width:82%;border-radius:5px;background:#F1F1F4;animation:pulse 1.4s ease-in-out infinite .3s;"></div></div>
+          </div>
+          <div style="flex:1;padding:14px 16px;display:flex;flex-direction:column;gap:11px;">
+            <div style="font-size:12.5px;font-weight:600;color:#A1A1AA;">Refuting</div>
+            <div style="border:1px solid #EEE;border-radius:8px;padding:12px;display:flex;flex-direction:column;gap:8px;"><div style="height:12px;width:48%;border-radius:5px;background:#ECECEF;animation:pulse 1.4s ease-in-out infinite .15s;"></div><div style="height:8px;width:30%;border-radius:5px;background:#F1F1F4;animation:pulse 1.4s ease-in-out infinite .2s;"></div><div style="height:8px;width:94%;border-radius:5px;background:#F1F1F4;animation:pulse 1.4s ease-in-out infinite .25s;"></div><div style="height:8px;width:80%;border-radius:5px;background:#F1F1F4;animation:pulse 1.4s ease-in-out infinite .3s;"></div></div>
+          </div>
+        </div>
+        <div style="height:74px;flex:none;border-radius:13px;background:#F1F1F4;animation:pulse 1.4s ease-in-out infinite;"></div>
+      </div>
+    </sc-if>
+
+    <!-- RESULTS -->
+    <sc-if value="{{ showResults }}" hint-placeholder-val="{{ false }}">
+      <div style="flex:1;min-height:0;display:flex;flex-direction:column;gap:12px;animation:fadeUp .35s ease;">
+
+        <!-- evidence panel -->
+        <div style="flex:1;min-height:0;display:flex;border:1px solid #E4E4E7;border-radius:12px;overflow:hidden;background:#fff;">
+
+          <!-- SUPPORTING -->
+          <div style="flex:1;min-width:0;display:flex;flex-direction:column;border-right:1px solid #E4E4E7;">
+            <div style="display:flex;align-items:center;gap:8px;padding:13px 16px 10px;flex:none;">
+              <span style="width:8px;height:8px;border-radius:50%;background:#16A34A;"></span>
+              <span style="font-size:13.5px;font-weight:600;">Supporting</span>
+              <span style="{{ supBadgeStyle }}">{{ supportCount }}</span>
+            </div>
+            <div style="flex:1;min-height:0;overflow-y:auto;padding:0 16px 14px;display:flex;flex-direction:column;gap:10px;">
+              <sc-for list="{{ supportingCards }}" as="card" hint-placeholder-count="2">
+                <div style="border:1px solid #E4E4E7;border-radius:9px;padding:11px 13px;display:flex;flex-direction:column;gap:7px;box-shadow:0 1px 2px rgba(0,0,0,.03);">
+                  <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;">
+                    <a href="{{ card.url }}" target="_blank" style="font-size:13px;font-weight:600;color:#4F46E5;text-decoration:none;cursor:pointer;" style-hover="text-decoration:underline;">{{ card.article }}</a>
+                    <div style="display:flex;align-items:center;gap:4px;flex:none;">
+                      <span style="font-size:12.5px;font-weight:600;font-family:'Geist Mono',monospace;">{{ card.confidenceStr }}</span>
+                      <span data-tip="{{ card.tipId }}" onMouseEnter="{{ onTipEnter }}" onMouseLeave="{{ onTipLeave }}" style="display:inline-flex;cursor:help;color:#A1A1AA;position:relative;">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 2.5-3 4"/><path d="M12 17h.01"/></svg>
+                        <sc-if value="{{ card.tipActive }}" hint-placeholder-val="{{ false }}">
+                          <span style="position:absolute;top:calc(100% + 9px);right:-6px;width:228px;background:#18181B;color:#fff;font-size:11px;line-height:1.5;padding:9px 11px;border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.22);z-index:40;font-weight:400;text-align:left;">NLI confidence score — how strongly this passage supports or refutes the claim. Above 0.85 is high confidence.<span style="position:absolute;bottom:100%;right:9px;width:9px;height:9px;background:#18181B;transform:translateY(50%) rotate(45deg);"></span></span>
+                        </sc-if>
+                      </span>
+                    </div>
+                  </div>
+                  <div style="display:flex;align-items:center;gap:8px;">
+                    <span style="font-size:9.5px;font-weight:600;font-family:'Geist Mono',monospace;padding:2px 6px;border-radius:4px;color:{{ card.langColor }};background:{{ card.langBg }};">{{ card.language }}</span>
+                    <span style="font-size:11.5px;color:#A1A1AA;font-family:'Geist Mono',monospace;">§ {{ card.sectionLabel }}</span>
+                  </div>
+                  <p style="margin:0;font-size:12.5px;line-height:1.55;color:#3F3F46;">{{ card.text }}</p>
+                  <sc-if value="{{ card.hasSpan }}" hint-placeholder-val="{{ false }}">
+                    <div style="border-left:3px solid #16A34A;padding:3px 8px;background:rgba(22,163,74,.06);border-radius:0 4px 4px 0;font-size:12px;color:#15803D;font-style:italic;">{{ card.span }}</div>
+                  </sc-if>
+                  <div style="display:flex;align-items:center;gap:6px;">
+                    <span style="width:14px;height:14px;border-radius:3px;background:#fff;border:1px solid #D4D4D8;display:flex;align-items:center;justify-content:center;font-family:Georgia,serif;font-size:9px;color:#52525B;flex:none;">W</span>
+                    <a href="{{ card.url }}" target="_blank" style="font-size:12px;color:#6366F1;text-decoration:none;cursor:pointer;" style-hover="text-decoration:underline;">View source →</a>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+
+          <!-- REFUTING -->
+          <div style="flex:1;min-width:0;display:flex;flex-direction:column;">
+            <div style="display:flex;align-items:center;gap:8px;padding:13px 16px 10px;flex:none;">
+              <span style="width:8px;height:8px;border-radius:50%;background:#DC2626;"></span>
+              <span style="font-size:13.5px;font-weight:600;">Refuting</span>
+              <span style="{{ refBadgeStyle }}">{{ refuteCount }}</span>
+            </div>
+            <!-- empty state -->
+            <sc-if value="{{ showRefuteEmpty }}" hint-placeholder-val="{{ true }}">
+              <div style="flex:1;min-height:0;padding:0 16px 16px;display:flex;">
+                <div style="flex:1;border:1px dashed #E4E4E7;border-radius:9px;padding:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;background:#FAFAFA;text-align:center;">
+                  <div style="width:42px;height:42px;border-radius:50%;background:#DCFCE7;display:flex;align-items:center;justify-content:center;">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                  </div>
+                  <span style="font-size:12.5px;color:#71717A;line-height:1.55;max-width:220px;">{{ refuteEmptyMsg }}</span>
+                </div>
+              </div>
+            </sc-if>
+            <!-- refuting cards -->
+            <sc-if value="{{ showRefuteCards }}" hint-placeholder-val="{{ false }}">
+              <div style="flex:1;min-height:0;overflow-y:auto;padding:0 16px 14px;display:flex;flex-direction:column;gap:10px;">
+                <sc-for list="{{ refutingCards }}" as="card" hint-placeholder-count="1">
+                  <div style="border:1px solid #FEE2E2;border-radius:9px;padding:11px 13px;display:flex;flex-direction:column;gap:7px;box-shadow:0 1px 2px rgba(0,0,0,.03);">
+                    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;">
+                      <a href="{{ card.url }}" target="_blank" style="font-size:13px;font-weight:600;color:#DC2626;text-decoration:none;cursor:pointer;" style-hover="text-decoration:underline;">{{ card.article }}</a>
+                      <div style="display:flex;align-items:center;gap:4px;flex:none;">
+                        <span style="font-size:12.5px;font-weight:600;font-family:'Geist Mono',monospace;">{{ card.confidenceStr }}</span>
+                        <span data-tip="{{ card.tipId }}" onMouseEnter="{{ onTipEnter }}" onMouseLeave="{{ onTipLeave }}" style="display:inline-flex;cursor:help;color:#A1A1AA;position:relative;">
+                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 2.5-3 4"/><path d="M12 17h.01"/></svg>
+                          <sc-if value="{{ card.tipActive }}" hint-placeholder-val="{{ false }}">
+                            <span style="position:absolute;top:calc(100% + 9px);right:-6px;width:228px;background:#18181B;color:#fff;font-size:11px;line-height:1.5;padding:9px 11px;border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.22);z-index:40;font-weight:400;text-align:left;">NLI confidence score — how strongly this passage supports or refutes the claim. Above 0.85 is high confidence.<span style="position:absolute;bottom:100%;right:9px;width:9px;height:9px;background:#18181B;transform:translateY(50%) rotate(45deg);"></span></span>
+                          </sc-if>
+                        </span>
+                      </div>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <span style="font-size:9.5px;font-weight:600;font-family:'Geist Mono',monospace;padding:2px 6px;border-radius:4px;color:{{ card.langColor }};background:{{ card.langBg }};">{{ card.language }}</span>
+                      <span style="font-size:11.5px;color:#A1A1AA;font-family:'Geist Mono',monospace;">§ {{ card.sectionLabel }}</span>
+                    </div>
+                    <p style="margin:0;font-size:12.5px;line-height:1.55;color:#3F3F46;">{{ card.text }}</p>
+                    <sc-if value="{{ card.hasSpan }}" hint-placeholder-val="{{ false }}">
+                      <div style="border-left:3px solid #DC2626;padding:3px 8px;background:rgba(220,38,38,.06);border-radius:0 4px 4px 0;font-size:12px;color:#B91C1C;font-style:italic;">{{ card.span }}</div>
+                    </sc-if>
+                    <div style="display:flex;align-items:center;gap:6px;">
+                      <span style="width:14px;height:14px;border-radius:3px;background:#fff;border:1px solid #D4D4D8;display:flex;align-items:center;justify-content:center;font-family:Georgia,serif;font-size:9px;color:#52525B;flex:none;">W</span>
+                      <a href="{{ card.url }}" target="_blank" style="font-size:12px;color:#6366F1;text-decoration:none;cursor:pointer;" style-hover="text-decoration:underline;">View source →</a>
+                    </div>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
+          </div>
+        </div>
+
+        <!-- TRACE STRIP -->
+        <div style="flex:none;border:1px solid #E4E4E7;border-radius:11px;background:#fff;padding:9px 14px;display:flex;align-items:center;gap:16px;">
+          <span style="font-size:10.5px;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;color:#71717A;flex:none;">Retrieval trace</span>
+          <sc-if value="{{ traceOpen }}" hint-placeholder-val="{{ true }}">
+            <div style="flex:1;display:flex;align-items:center;gap:11px;flex-wrap:wrap;min-width:0;">
+              <div style="display:flex;flex-direction:column;gap:2px;"><span style="font-size:9px;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;color:#A1A1AA;">Claim</span><span style="font-size:11.5px;color:#3F3F46;">{{ traceClaimShort }}</span></div>
+              <span style="color:#D4D4D8;">→</span>
+              <div style="display:flex;flex-direction:column;gap:3px;"><span style="font-size:9px;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;color:#A1A1AA;">Rewritten queries</span><div style="display:flex;gap:4px;flex-wrap:wrap;">
+                <sc-for list="{{ traceQueries }}" as="q" hint-placeholder-count="3">
+                  <span style="font-size:10px;color:#4338CA;background:#EEF2FF;padding:1px 6px;border-radius:5px;">{{ q.text }}</span>
+                </sc-for>
+              </div></div>
+              <span style="color:#D4D4D8;">→</span>
+              <div style="display:flex;flex-direction:column;gap:2px;"><span style="font-size:9px;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;color:#A1A1AA;">Retrieved</span><span style="font-size:11.5px;color:#3F3F46;font-family:'Geist Mono',monospace;">{{ traceRetrieved }}</span></div>
+              <span style="color:#D4D4D8;">→</span>
+              <div style="display:flex;flex-direction:column;gap:2px;"><span style="font-size:9px;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;color:#A1A1AA;">NLI breakdown</span><span style="font-size:11.5px;font-family:'Geist Mono',monospace;"><span style="color:#16A34A;">SUPPORTS ×{{ traceNliSupports }}</span> · <span style="color:#D97706;">NEI ×{{ traceNliNei }}</span> · <span style="color:#DC2626;">REFUTES ×{{ traceNliRefutes }}</span></span></div>
+            </div>
+          </sc-if>
+          <button onClick="{{ toggleTrace }}" style="flex:none;margin-left:auto;background:none;border:none;cursor:pointer;font-size:11.5px;color:#A1A1AA;display:flex;align-items:center;gap:4px;" style-hover="color:#4F46E5;">
+            <sc-if value="{{ traceOpen }}" hint-placeholder-val="{{ true }}"><span style="display:flex;align-items:center;gap:4px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 15 6-6 6 6"/></svg>Collapse</span></sc-if>
+            <sc-if value="{{ traceClosed }}" hint-placeholder-val="{{ false }}"><span style="display:flex;align-items:center;gap:4px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>Expand</span></sc-if>
+          </button>
+        </div>
+
+        <!-- VERDICT BANNER -->
+        <div style="flex:none;border-radius:13px;padding:14px 20px;display:flex;align-items:center;gap:24px;{{ verdictBannerStyle }}">
+          <div style="display:flex;align-items:center;gap:13px;flex:none;">
+            <div style="width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex:none;box-shadow:0 2px 6px rgba(0,0,0,.15);background:{{ verdictIconBg }};">
+              <sc-if value="{{ isSupported }}" hint-placeholder-val="{{ true }}">
+                <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+              </sc-if>
+              <sc-if value="{{ isRefuted }}" hint-placeholder-val="{{ false }}">
+                <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+              </sc-if>
+              <sc-if value="{{ isNei }}" hint-placeholder-val="{{ false }}">
+                <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 2.5-3 4"/><path d="M12 17h.01"/></svg>
+              </sc-if>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:2px;">
+              <span style="font-size:18px;font-weight:600;letter-spacing:-0.01em;color:{{ verdictTitleColor }};">{{ verdictLabel }}</span>
+              <span style="font-size:12px;color:{{ verdictSubtitleColor }};">{{ verdictSubtitle }}</span>
+            </div>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0;">
+            <div style="width:260px;max-width:100%;height:11px;border-radius:999px;overflow:hidden;display:flex;background:#E5E7EB;">
+              <div style="width:{{ verdictSupportPctW }};background:#16A34A;"></div><div style="width:{{ verdictRefutePctW }};background:#DC2626;"></div>
+            </div>
+            <span style="font-size:11px;color:#52525B;">{{ verdictBreakdown }}</span>
+          </div>
+          <div style="flex:none;display:flex;flex-direction:column;align-items:flex-end;gap:8px;">
+            <button onClick="{{ copyResult }}" style="display:flex;align-items:center;justify-content:center;gap:6px;min-width:106px;background:#fff;border:1px solid {{ verdictBorderColor }};border-radius:8px;padding:6px 11px;font-size:12px;font-weight:500;color:{{ verdictTitleColor }};cursor:pointer;" style-hover="opacity:.85;">
+              <sc-if value="{{ copied }}" hint-placeholder-val="{{ false }}"><span style="display:flex;align-items:center;gap:6px;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Copied</span></sc-if>
+              <sc-if value="{{ notCopied }}" hint-placeholder-val="{{ true }}"><span style="display:flex;align-items:center;gap:6px;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copy result</span></sc-if>
+            </button>
+            <div style="display:flex;align-items:center;gap:5px;position:relative;">
+              <span style="font-size:22px;font-weight:600;color:#4F46E5;font-family:'Geist Mono',monospace;letter-spacing:-0.01em;">{{ verdictConfidence }}</span>
+              <span data-tip="verdict" onMouseEnter="{{ onTipEnter }}" onMouseLeave="{{ onTipLeave }}" style="display:inline-flex;cursor:help;color:#A1A1AA;position:relative;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 2.5-3 4"/><path d="M12 17h.01"/></svg>
+                <sc-if value="{{ tipIsVerdict }}" hint-placeholder-val="{{ false }}">
+                  <span style="position:absolute;bottom:calc(100% + 9px);right:-6px;width:236px;background:#18181B;color:#fff;font-size:11px;line-height:1.5;padding:9px 11px;border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.22);z-index:40;font-weight:400;text-align:left;">Overall confidence combining NLI scores across all retrieved passages. Above 0.85 indicates strong evidence.<span style="position:absolute;top:100%;right:9px;width:9px;height:9px;background:#18181B;transform:translateY(-50%) rotate(45deg);"></span></span>
+                </sc-if>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+  </div>
+
+  <!-- ===================== GATE ===================== -->
+  <sc-if value="{{ showGate }}" hint-placeholder-val="{{ true }}">
+    <div style="position:absolute;inset:0;z-index:100;background:#0F0A2E;display:flex;align-items:center;justify-content:center;overflow:hidden;">
+      <div style="position:absolute;width:760px;height:760px;border-radius:50%;background:radial-gradient(circle, rgba(99,91,255,.40) 0%, rgba(79,70,229,.12) 38%, transparent 68%);pointer-events:none;"></div>
+      <div style="position:absolute;width:440px;height:440px;border-radius:50%;background:radial-gradient(circle, rgba(124,58,237,.22) 0%, transparent 70%);top:-90px;right:-30px;pointer-events:none;"></div>
+      <div style="position:relative;width:400px;background:#fff;border-radius:16px;padding:38px 36px 30px;box-shadow:0 30px 80px rgba(0,0,0,.45);display:flex;flex-direction:column;align-items:center;text-align:center;animation:fadeUp .45s ease;">
+        <div style="display:flex;align-items:center;gap:9px;">
+          <div style="width:26px;height:26px;border-radius:7px;background:#4F46E5;display:flex;align-items:center;justify-content:center;flex:none;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+          </div>
+          <span style="font-size:20px;letter-spacing:-0.02em;"><span style="font-weight:400;">Wiki</span><span style="font-weight:600;">Check</span></span>
+        </div>
+        <p style="font-size:13px;color:#A1A1AA;margin:10px 0 0;">Fact verification based on Wikipedia</p>
+        <h2 style="font-size:22px;font-weight:600;letter-spacing:-0.02em;margin:26px 0 6px;">Early access</h2>
+        <p style="font-size:14px;color:#71717A;margin:0 0 22px;">Enter your access code to continue</p>
+        <div style="display:flex;gap:9px;justify-content:center;margin-bottom:14px;">
+          <sc-for list="{{ codeBoxes }}" as="box" hint-placeholder-count="6">
+            <input type="text" maxLength="1" value="{{ box.char }}" data-idx="{{ box.idx }}" onChange="{{ onCodeInput }}" onKeyDown="{{ onCodeKey }}" style="width:46px;height:54px;border:1.5px solid #E4E4E7;border-radius:11px;text-align:center;font-size:22px;font-weight:600;color:#18181B;outline:none;background:#FAFAFA;transition:.15s;" style-focus="border-color:#4F46E5;background:#fff;box-shadow:0 0 0 3px rgba(79,70,229,.18);"/>
+          </sc-for>
+        </div>
+        <sc-if value="{{ accessError }}" hint-placeholder-val="{{ false }}">
+          <p style="font-size:13px;color:#DC2626;margin:0 0 14px;font-weight:500;">{{ accessError }}</p>
+        </sc-if>
+        <button onClick="{{ onContinue }}" style="width:100%;display:flex;align-items:center;justify-content:center;gap:8px;background:#4F46E5;color:#fff;border:none;border-radius:11px;padding:14px;font-size:15px;font-weight:600;cursor:pointer;box-shadow:0 2px 8px rgba(79,70,229,.35);" style-hover="background:#4338CA;">
+          Continue
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
+        </button>
+      </div>
+    </div>
+  </sc-if>
+
+ </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{
+  &quot;$preview&quot;: { &quot;width&quot;: 1280, &quot;height&quot;: 900 },
+  &quot;startScreen&quot;: { &quot;editor&quot;: &quot;enum&quot;, &quot;options&quot;: [&quot;gate&quot;, &quot;ready&quot;, &quot;results&quot;], &quot;default&quot;: &quot;gate&quot;, &quot;tsType&quot;: &quot;'gate' | 'ready' | 'results'&quot; },
+  &quot;multilingualDefault&quot;: { &quot;editor&quot;: &quot;boolean&quot;, &quot;default&quot;: false, &quot;tsType&quot;: &quot;boolean&quot; }
+}">
+const API_BASE = '';
+
+const LANG_COLORS = {
+  EN: { bg: '#E0E7FF', color: '#4338CA' },
+  DE: { bg: '#DBEAFE', color: '#2563EB' },
+  FR: { bg: '#EDE9FE', color: '#7C3AED' },
+  ZH: { bg: '#FEF3C7', color: '#B45309' },
+  ES: { bg: '#FCE7F3', color: '#BE185D' },
+  PT: { bg: '#D1FAE5', color: '#047857' },
+  UK: { bg: '#FEE2E2', color: '#B91C1C' },
+};
+
+class Component extends DCLogic {
+  timers = [];
+  _checkId = 0;
+
+  state = {
+    phase: 'gate',
+    code: ['', '', '', '', '', ''],
+    accessError: '',
+    view: 'empty',
+    claim: '',
+    multilingual: false,
+    loadingStep: 0,
+    passageCount: 0,
+    traceOpen: true,
+    copied: false,
+    tip: null,
+    focused: false,
+    supportingCards: [],
+    refutingCards: [],
+    verdict: null,
+    trace: null,
+  };
+
+  componentDidMount() {
+    const ss = this.props.startScreen;
+    if (ss === 'ready') this.setState({ phase: 'app', view: 'empty' });
+    else if (ss === 'results') this.setState({ phase: 'app', view: 'empty' });
+    if (this.props.multilingualDefault) this.setState({ multilingual: true });
+  }
+
+  async submitCode() {
+    const code = this.state.code.join('');
+    try {
+      const r = await fetch(`${API_BASE}/api/verify-access`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code }),
+      });
+      if (r.status === 429) {
+        this.setState({ accessError: 'Too many requests. Please try again later.' });
+        return;
+      }
+      const res = await r.json();
+      if (res.ok) {
+        this.setState({ phase: 'app', view: 'empty', accessError: '' });
+      } else {
+        this.setState({ accessError: 'Invalid access code. Please try again.' });
+      }
+    } catch (err) {
+      this.setState({ accessError: 'Invalid access code. Please try again.' });
+    }
+  }
+
+  componentWillUnmount() { this.clearTimers(); }
+  clearTimers() { (this.timers || []).forEach(clearTimeout); this.timers = []; }
+
+  async startCheck() {
+    if (!this.state.claim.trim()) return;
+    this.clearTimers();
+    const myId = ++this._checkId;
+    const claim = this.state.claim.trim();
+    const languages = this.state.multilingual
+      ? ['en', 'de', 'fr', 'zh', 'es', 'pt', 'uk']
+      : ['en'];
+
+    this.setState({ view: 'loading', loadingStep: 0, passageCount: 0 });
+
+    try {
+      const accessCode = this.state.code.join('');
+      const searchRes = await fetch(`${API_BASE}/api/search`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Access-Code': accessCode },
+        body: JSON.stringify({ claim, languages }),
+      }).then(r => r.json());
+
+      if (myId !== this._checkId) return;
+      this.setState({ loadingStep: 1, passageCount: searchRes.passage_count });
+
+      const rerankRes = await fetch(`${API_BASE}/api/rerank`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Access-Code': accessCode },
+        body: JSON.stringify({ claim, passages: searchRes.passages, queries: searchRes.queries }),
+      }).then(r => r.json());
+
+      if (myId !== this._checkId) return;
+      this.setState({ loadingStep: 2 });
+
+      const verifyRes = await fetch(`${API_BASE}/api/verify`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Access-Code': accessCode },
+        body: JSON.stringify({ claim, passages: rerankRes.passages, queries: rerankRes.queries }),
+      }).then(r => r.json());
+
+      if (myId !== this._checkId) return;
+      this.setState({
+        view: 'results',
+        supportingCards: verifyRes.supporting_evidence || [],
+        refutingCards: verifyRes.refuting_evidence || [],
+        verdict: verifyRes.verdict || null,
+        trace: verifyRes.trace || null,
+      });
+    } catch (err) {
+      if (myId !== this._checkId) return;
+      console.error('WikiCheck error:', err);
+      this.setState({ view: 'empty' });
+    }
+  }
+
+  doCopy() {
+    const s = this.state;
+    const v = s.verdict;
+    const txt = v
+      ? `WikiCheck — ${v.label} (${v.confidence} confidence)\nClaim: "${s.claim}"\n${v.support_count} of ${v.total_count} passages support · ${v.refute_count} refuting.`
+      : `WikiCheck\nClaim: "${s.claim}"`;
+    try { if (navigator.clipboard) navigator.clipboard.writeText(txt); } catch (e) {}
+    this.setState({ copied: true });
+    this.timers.push(setTimeout(() => this.setState({ copied: false }), 1600));
+  }
+
+  renderVals() {
+    const s = this.state;
+    const claim = (s.claim || '').trim();
+    const hasNum = /\d/.test(claim);
+    const hasName = /[A-Z][a-z]{2,}/.test(claim);
+    const good = claim.length >= 16 && (hasNum || hasName);
+    const isApp = s.phase === 'app';
+    const step = s.loadingStep;
+    const v = s.verdict;
+    const tr = s.trace;
+
+    const searchLabel = s.multilingual ? 'Searching Wikipedia (multilingual)' : 'Searching English Wikipedia';
+
+    // Verdict theme
+    const label = v ? v.label : 'NOT ENOUGH INFO';
+    const isSupported = label === 'SUPPORTS';
+    const isRefuted = label === 'REFUTES';
+    const isNei = !isSupported && !isRefuted;
+
+    const theme = isSupported
+      ? { bannerBg: '#F0FDF4', bannerBorder: '#BBF7D0', iconBg: '#16A34A', titleColor: '#14532D', subtitleColor: '#4D7C5A', verdictLabel: 'Supported by Wikipedia' }
+      : isRefuted
+      ? { bannerBg: '#FEF2F2', bannerBorder: '#FECACA', iconBg: '#DC2626', titleColor: '#7F1D1D', subtitleColor: '#B45454', verdictLabel: 'Refuted by Wikipedia' }
+      : { bannerBg: '#FFFBEB', bannerBorder: '#FDE68A', iconBg: '#D97706', titleColor: '#78350F', subtitleColor: '#92400E', verdictLabel: 'Insufficient Evidence' };
+
+    const total = v ? Math.max(v.total_count, 1) : 1;
+    const supportPct = v ? Math.round((v.support_count / total) * 100) : 0;
+    const refutePct = v ? Math.round((v.refute_count / total) * 100) : 0;
+    const neiPct = 100 - supportPct - refutePct;
+
+    // Card augmentation
+    const augCard = (c, prefix) => {
+      const lc = LANG_COLORS[c.language] || LANG_COLORS.EN;
+      return {
+        ...c,
+        confidenceStr: c.confidence ? c.confidence.charAt(0).toUpperCase() + c.confidence.slice(1) : '—',
+        sectionLabel: c.section || 'Summary',
+        langBg: lc.bg,
+        langColor: lc.color,
+        hasSpan: !!(c.span && c.span.trim()),
+        tipId: `${prefix}_${c.article}_${c.language}`,
+        tipActive: s.tip === `${prefix}_${c.article}_${c.language}`,
+      };
+    };
+
+    const supportingCards = (s.supportingCards || []).map(c => augCard(c, 'sup'));
+    const refutingCards  = (s.refutingCards  || []).map(c => augCard(c, 'ref'));
+    const supCount = supportingCards.length;
+    const refCount = refutingCards.length;
+
+    // Trace
+    const traceQueries = tr ? (tr.rewritten_queries || []).map(q => ({ text: q })) : [];
+    const traceClaimShort = claim.length > 32 ? claim.slice(0, 32) + '…' : claim;
+    const traceRetrieved = tr ? `${tr.retrieved_articles} articles · ${tr.total_passages} passages` : '—';
+    const nliB = tr ? tr.nli_breakdown : {};
+
+    return {
+      showGate: s.phase === 'gate',
+      showEmpty: isApp && s.view === 'empty',
+      showLoading: isApp && s.view === 'loading',
+      showResults: isApp && s.view === 'results',
+
+      composerFocusStyle: s.focused ? 'border-color:#4F46E5;box-shadow:0 0 0 3px rgba(79,70,229,.15);' : '',
+
+      accessError: s.accessError,
+      codeBoxes: s.code.map((c, i) => ({ char: c, idx: i })),
+      claim: s.claim,
+      qualityGood: claim.length > 0 && good,
+      qualityVague: claim.length > 0 && !good,
+      qualityEmpty: claim.length === 0,
+
+      multilingual: s.multilingual,
+      multiTrackBg: s.multilingual ? '#4F46E5' : '#D4D4D8',
+      multiKnobX: s.multilingual ? 'translateX(15px)' : 'translateX(0px)',
+
+      searchLabel,
+      passageCount: s.passageCount,
+
+      load0active: step === 0,
+      load0done: step >= 1,
+      load1active: step === 1,
+      load1done: step >= 2,
+      load1pending: step < 1,
+      load2active: step === 2,
+      load2pending: step < 2,
+
+      supportingCards,
+      refutingCards,
+      supportCount: supCount,
+      refuteCount: refCount,
+      supBadgeStyle: supCount > 0
+        ? 'font-size:11px;font-weight:600;color:#16A34A;background:#DCFCE7;padding:1px 8px;border-radius:999px;'
+        : 'font-size:11px;font-weight:600;color:#71717A;background:#F1F1F4;padding:1px 8px;border-radius:999px;',
+      refBadgeStyle: refCount > 0
+        ? 'font-size:11px;font-weight:600;color:#DC2626;background:#FEE2E2;padding:1px 8px;border-radius:999px;'
+        : 'font-size:11px;font-weight:600;color:#71717A;background:#F1F1F4;padding:1px 8px;border-radius:999px;',
+      showRefuteEmpty: refCount === 0,
+      showRefuteCards: refCount > 0,
+      refuteEmptyMsg: tr
+        ? `No contradicting passages found across ${tr.retrieved_articles} retrieved articles.`
+        : 'No refuting passages found.',
+
+      traceQueries,
+      traceClaimShort,
+      traceRetrieved,
+      traceNliSupports: nliB.supports || 0,
+      traceNliNei: nliB.nei || 0,
+      traceNliRefutes: nliB.refutes || 0,
+      traceOpen: s.traceOpen,
+      traceClosed: !s.traceOpen,
+
+      isSupported,
+      isRefuted,
+      isNei,
+      verdictBannerStyle: `background:${theme.bannerBg};border:1px solid ${theme.bannerBorder};`,
+      verdictIconBg: theme.iconBg,
+      verdictTitleColor: theme.titleColor,
+      verdictSubtitleColor: theme.subtitleColor,
+      verdictBorderColor: theme.bannerBorder,
+      verdictLabel: theme.verdictLabel,
+      verdictSubtitle: v ? `${v.support_count} of ${v.total_count} passages support · ${v.refute_count} refuting` : '—',
+      verdictSupportPctW: `${supportPct}%`,
+      verdictNeiPctW: `${neiPct}%`,
+      verdictRefutePctW: `${refutePct}%`,
+      verdictBreakdown: `${supportPct}% support · ${refutePct}% refuting`,
+      verdictConfidence: v ? v.confidence.charAt(0).toUpperCase() + v.confidence.slice(1) : '—',
+
+      copied: s.copied,
+      notCopied: !s.copied,
+      tipIsVerdict: s.tip === 'verdict',
+
+      onCodeInput: (e) => {
+        const i = +e.target.dataset.idx;
+        const val = (e.target.value || '').slice(-1);
+        const code = [...this.state.code];
+        code[i] = val;
+        this.setState({ code, accessError: '' });
+        if (val && e.target.nextElementSibling && e.target.nextElementSibling.focus) e.target.nextElementSibling.focus();
+      },
+      onCodeKey: (e) => {
+        if (e.key === 'Enter') this.submitCode();
+        if (e.key === 'Backspace' && !e.target.value && e.target.previousElementSibling && e.target.previousElementSibling.focus) e.target.previousElementSibling.focus();
+      },
+      onContinue: () => this.submitCode(),
+      onClaimInput: (e) => this.setState({ claim: e.target.value }),
+      onFocus: () => this.setState({ focused: true }),
+      onBlur: () => this.setState({ focused: false }),
+      toggleMulti: () => this.setState({ multilingual: !this.state.multilingual }),
+      fillChip: (e) => this.setState({ claim: e.currentTarget.dataset.claim }),
+      runCheck: () => this.startCheck(),
+      toggleTrace: () => this.setState({ traceOpen: !this.state.traceOpen }),
+      copyResult: () => this.doCopy(),
+      onTipEnter: (e) => this.setState({ tip: e.currentTarget.dataset.tip }),
+      onTipLeave: () => this.setState({ tip: null }),
+    };
+  }
+}
+</script>
+</body>
+</html>

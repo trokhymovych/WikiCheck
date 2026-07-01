@@ -1,8 +1,0 @@
-{
-  "train_path": "/opt/math/jupyter/ntr/Experiments_with_text/data/SNLI/train.tsv",
-  "dev_path": "/opt/math/jupyter/ntr/Experiments_with_text/data/SNLI/dev.tsv",
-  "test_path": "/opt/math/jupyter/ntr/Experiments_with_text/data/SNLI/test.tsv",
-  "base_model": "bert-base-uncased",
-  "batch_size": 64,
-  "path_to_save": "/opt/math/jupyter/ntr/Experiments_with_text/fairapi/models/"
-}
