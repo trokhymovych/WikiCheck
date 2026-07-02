@@ -5,6 +5,7 @@ import os
 from abc import ABC, abstractmethod
 from typing import Any, Type
 
+import httpx
 from openai import OpenAI
 from pydantic import BaseModel
 
@@ -33,13 +34,10 @@ class OpenAIClient(LLMClient):
 
 
 class WikimediaLLMClient(LLMClient):
+    BASE_URL = "https://api.wikimedia.org/service/lw/inference/v1/models/{model}/openai/v1/chat/completions"
+
     def __init__(self, model: str = "qwen3-14b"):
-        base_url = os.environ["WIKIMEDIA_INFERENCE_BASE"].format(model=model)
-        api_key = os.environ["WIKIMEDIA_API_KEY"]
-        self._client = OpenAI(
-            api_key=api_key,
-            base_url=base_url,
-        )
+        self._url = self.BASE_URL.format(model=model)
         self.model = model
 
     def complete(self, system: str, user: str, response_format: Type[BaseModel]) -> Any:
@@ -47,12 +45,22 @@ class WikimediaLLMClient(LLMClient):
         augmented_system = (
             f"{system}\n\nRespond with valid JSON matching this schema:\n{schema_str}"
         )
-        response = self._client.chat.completions.create(
-            model=self.model,
-            messages=[
+        payload = {
+            "model": self.model,
+            "messages": [
                 {"role": "system", "content": augmented_system},
                 {"role": "user", "content": user},
             ],
-            response_format={"type": "json_object"},
-        )
-        return response_format.model_validate_json(response.choices[0].message.content)
+            "response_format": {"type": "json_object"},
+            "stream": False,
+        }
+        headers = {
+            "Content-Type": "application/json",
+            "User-Agent": os.environ["WIKIMEDIA_USER_AGENT"],
+        }
+        response = httpx.post(self._url, json=payload, headers=headers)
+        if not response.is_success:
+            raise RuntimeError(f"Wikimedia API {response.status_code}: {response.text}")
+        response.raise_for_status()
+        content = response.json()["choices"][0]["message"]["content"]
+        return response_format.model_validate_json(content)
